@@ -1,4 +1,4 @@
-import React, { useRef, useState, FC } from "react";
+import React, { useRef, FC } from "react";
 import { useDeepCompareEffect } from "use-deep-compare";
 import { bindProteinPaint } from "@sjcrh/proteinpaint-client";
 import { useIsDemoApp } from "@/hooks/useIsDemoApp";
@@ -7,7 +7,6 @@ import {
   FilterSet,
   //PROTEINPAINT_API,
   useFetchUserDetailsQuery,
-  useCoreDispatch,
   convertFilterSetToGqlFilter as buildCohortGqlOperator
 } from "@gen3/core";
 import { isEqual, cloneDeep } from "lodash";
@@ -31,29 +30,7 @@ export const DEwrapper: FC<PpProps> = (props: PpProps) => {
 
   // to track reusable instance for mds3 skewer track
   const prevArg = useRef<any>({});
-  const coreDispatch = useCoreDispatch();
-  const [showSaveCohort, setShowSaveCohort] = useState(false);
-  //const [createSet, response] = useCreateCaseSetFromValuesMutation();
-  // const [newCohortFilters, setNewCohortFilters] =
-  //   useState<FilterSet>(undefined);
-
-  // a set for the new cohort is created, now show the save cohort modal
-  // useDeepCompareEffect(() => {
-  //   if (response.isSuccess) {
-  //     const filters: FilterSet = {
-  //       mode: "and",
-  //       root: {
-  //         "cases.case_id": {
-  //           operator: "includes",
-  //           field: "cases.case_id",
-  //           operands: [`set_id:${response.data}`],
-  //         },
-  //       },
-  //     };
-  //     setNewCohortFilters(filters);
-  //     setShowSaveCohort(true);
-  //   }
-  // }, [response.isSuccess, coreDispatch, response.data]);
+  const divRef = useRef<HTMLDivElement>(null);
 
   useDeepCompareEffect(
     () => {
@@ -97,24 +74,10 @@ export const DEwrapper: FC<PpProps> = (props: PpProps) => {
 
     [ isDemoMode, filter0, userDetails.currentData ],
   );
-
-  const divRef = useRef<HTMLDivElement>(null);
   return (
     <div>
       {isDemoMode && <DemoText>Showing cases in demo cohort.</DemoText>}
-      <div
-        ref={divRef}
-        className="sjpp-wrapper-root-div"
-        //userDetails={userDetails}
-      />
-
-      {/*<SaveCohortModal // Show the modal, create a saved cohort when save button is clicked
-        opened={showSaveCohort}
-        onClose={() => setShowSaveCohort(false)}
-        filters={newCohortFilters}
-        hooks={cohortActionsHooks}
-        invalidCohortNames={INVALID_COHORT_NAMES}
-      />*/}
+      <div ref={divRef} className="sjpp-wrapper-root-div" />
     </div>
   );
 };

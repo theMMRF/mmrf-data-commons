@@ -40,9 +40,9 @@ const openSaveCohortModal = (caseIds: ReadonlyArray<string>) => {
   const cohortFilters : FilterSet = {
     mode: 'and',
     root: {
-      case_id: {
+      'cases.case_id': {
         operator: 'in',
-        field: 'case_id',
+        field: 'cases.case_id',
         operands: Array.from(caseIds ?? []),
       },
     },
@@ -65,15 +65,18 @@ export const CasesCohortButton: React.FC<CasesCohortButtonProps> = ({
 
 
   // can reuse also in SelectCohortsModal right now
-  const getCaseIdsFromFilter = (filter: any): ReadonlyArray<string> | null => {
+  const getCaseIdsFromFilter = (filter: FilterSet): ReadonlyArray<string> | null => {
     // Check if filter only contains cases.case_id
     const rootKeys = Object.keys(filter?.root || {});
+    const caseIdFilter = filter?.root?.['cases.case_id'] as
+      | { operands?: ReadonlyArray<string> }
+      | undefined;
     if (
       rootKeys.length === 1 &&
       rootKeys[0] === 'cases.case_id' &&
-      filter.root['cases.case_id']?.operands
+      Array.isArray(caseIdFilter?.operands)
     ) {
-      return filter.root['cases.case_id'].operands;
+      return caseIdFilter.operands;
     }
     return null;
   };

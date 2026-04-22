@@ -18,5 +18,6 @@
     }
   ],
   "image": "images/empty.svg",
-  "showCredentialsLogin" : true
+  "showCredentialsLogin" : true,
+  "accessRequestUrl": "https://mmrf.formstack.com/forms/mmrf_virtual_lab_access_request"
 }
