@@ -13,6 +13,7 @@ import { isEqual, cloneDeep } from "lodash";
 import { DemoText } from "@/components/tailwindComponents";
 import { selectCurrentCohortCaseFilters } from "@/core/utils";
 import { COHORT_FILTER_INDEX, PROTEINPAINT_API } from '@/core';
+import { getProteinPaintToolContainer } from './toolContainer';
 
 const basepath = PROTEINPAINT_API;
 
@@ -47,14 +48,14 @@ export const DEwrapper: FC<PpProps> = (props: PpProps) => {
       if ((data || prevArg.current) && isEqual(prevArg.current, data)) return;
       prevArg.current = data
 
-      const toolContainer = rootElem?.parentNode?.parentNode?.parentNode as HTMLElement;
+      const toolContainer = getProteinPaintToolContainer(rootElem);
       if (!toolContainer) return
       toolContainer.style.backgroundColor = "#fff";
 
       const arg = Object.assign(
         { holder: rootElem, noheader: true, nobox: true },
         cloneDeep(data),
-      ) as Mds3Arg;
+      ) as DEArg;
 
       // bindProteinPaint() handles rapid update requests/race condition,
       // so no need to include debouncing and promise code in this wrapper
@@ -72,32 +73,34 @@ export const DEwrapper: FC<PpProps> = (props: PpProps) => {
       });
     },
 
-    [ isDemoMode, filter0, userDetails.currentData ],
+    [ isDemoMode, filter0, props.basepath, userDetails.currentData ],
   );
   return (
-    <div>
+    <div data-proteinpaint-tool-container="true">
       {isDemoMode && <DemoText>Showing cases in demo cohort.</DemoText>}
       <div ref={divRef} className="sjpp-wrapper-root-div" />
     </div>
   );
 };
 
-interface Mds3Arg {
+type CohortGqlFilter = ReturnType<typeof buildCohortGqlOperator>;
+
+interface DEArg {
   dslabel?: string;
   holder?: HTMLElement;
   noheader?: boolean;
   nobox?: boolean;
   hide_dsHandles?: boolean;
   host: string;
-  filter0?: FilterSet;
+  filter0?: CohortGqlFilter;
   launchGdcDE?: boolean;
 }
 
 function getDEtrack(
   props: PpProps,
-  filter0: any
+  filter0: CohortGqlFilter
 ) {
-  const arg: Mds3Arg = {
+  const arg: DEArg = {
     dslabel: 'MMRF',
     // host in gdc is just a relative url path,
     // using the same domain as the GDC portal where PP is embedded

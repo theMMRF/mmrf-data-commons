@@ -20,6 +20,7 @@ import {
   SelectSamplesCallBackArg,
   SelectSamplesCallback,
 } from "./sjpp-types";
+import { getProteinPaintToolContainer } from "./toolContainer";
 // import { cohortActionsHooks } from "../cohortBuilder/CohortManager/cohortActionHooks";
 // import { INVALID_COHORT_NAMES } from "../cohortBuilder/utils";
 import { COHORT_FILTER_INDEX, PROTEINPAINT_API } from '@/core';
@@ -112,7 +113,7 @@ export const ProteinPaintWrapper: FC<PpProps> = (props: PpProps) => {
       if ((data || prevArg.current) && isEqual(prevArg.current, data)) return;
       prevArg.current = data
 
-      const toolContainer = rootElem?.parentNode?.parentNode?.parentNode as HTMLElement;
+      const toolContainer = getProteinPaintToolContainer(rootElem);
       if (!toolContainer) return
       toolContainer.style.backgroundColor = "#fff";
 
@@ -152,7 +153,7 @@ export const ProteinPaintWrapper: FC<PpProps> = (props: PpProps) => {
     ? "Demo showing MYC CNV segments from all GDC cases"
     : "Demo showing MYC mutations from all GDC cases.";
   return (
-    <div>
+    <div data-proteinpaint-tool-container="true">
       {isDemoMode && <DemoText>{demoText}</DemoText>}
       <div
         ref={divRef}

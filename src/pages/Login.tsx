@@ -23,8 +23,12 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
     ? bottomContent
     : [];
   const resolvedAccessRequestUrl =
-    accessRequestUrl ??
-    'https://mmrf.formstack.com/forms/mmrf_virtual_lab_access_request';
+    accessRequestUrl ?? process.env.NEXT_PUBLIC_ACCESS_REQUEST_URL;
+  if (!resolvedAccessRequestUrl) {
+    console.error(
+      'Missing access request URL. Set loginConfig.accessRequestUrl or NEXT_PUBLIC_ACCESS_REQUEST_URL.',
+    );
+  }
   const getBottomContentClassName = (className?: string) =>
     className?.replace(/\bmt-10\b/, 'mt-4') ?? 'mt-4';
 
@@ -33,17 +37,19 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
       <PageTitle pageName="Login Page" />
       <div className="flex flex-col items-center">
         <LoginPanel {...loginPanelConfig} />
-        <Stack mt="md" w={260}>
-          <Button
-            component="a"
-            href={resolvedAccessRequestUrl}
-            target="_blank"
-            rel="noreferrer"
-            variant="outline"
-          >
-            Apply For Access
-          </Button>
-        </Stack>
+        {resolvedAccessRequestUrl ? (
+          <Stack mt="md" w={260}>
+            <Button
+              component="a"
+              href={resolvedAccessRequestUrl}
+              target="_blank"
+              rel="noreferrer"
+              variant="outline"
+            >
+              Apply For Access
+            </Button>
+          </Stack>
+        ) : null}
         {safeBottomContent.map((item, index) =>
           item.type === 'textWithEmail' ? (
             <Text

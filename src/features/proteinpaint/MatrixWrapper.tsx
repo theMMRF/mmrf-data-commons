@@ -35,6 +35,7 @@ import { isEqual, cloneDeep } from "lodash";
 //import { INVALID_COHORT_NAMES } from "../cohortBuilder/utils";
 import { COHORT_FILTER_INDEX, PROTEINPAINT_API } from '@/core';
 import { updateFilters } from './updateFilters';
+import { getProteinPaintToolContainer } from './toolContainer';
 
 const basepath = PROTEINPAINT_API;
 
@@ -193,7 +194,8 @@ export const MatrixWrapper: FC<PpProps> = (props: PpProps) => {
         // showing and hiding the overlay should be triggered by components that may take a while to load/render,
         // this wrapper code can show the overlay here since it has supplied postRender callbacks above,
         // but ideally it is the PP-app that triggers both the showing and hiding of the overlay for reliable behavior
-        const toolContainer = rootElem?.parentNode?.parentNode?.parentNode as HTMLElement;
+        const toolContainer = getProteinPaintToolContainer(rootElem);
+        if (!toolContainer) return;
         toolContainer.style.backgroundColor = "#fff";
       }
 
@@ -249,7 +251,7 @@ export const MatrixWrapper: FC<PpProps> = (props: PpProps) => {
   // };
   const existingFiltersHook = () => null;
   return (
-    <div className="relative">
+    <div className="relative" data-proteinpaint-tool-container="true">
       {isDemoMode && <DemoText>Showing cases in demo cohort.</DemoText>}
       <div
         ref={divRef}
