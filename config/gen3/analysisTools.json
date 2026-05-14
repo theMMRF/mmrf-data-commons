@@ -77,6 +77,17 @@
           "countUnits": "Cases"
         },
         {
+          "title": "Correlation Plot",
+          "type": "application",
+          "hasDemo": false,
+          "loginRequired": false,
+          "description": "Visualize correlations between clinical and genomic variables.",
+          "icon": "/icons/apps/CorrelationPlot.svg",
+          "appId": "Correlation",
+          "hideCounts": true,
+          "countUnits": "Cases"
+        },
+        {
           "title": "Genome Browser",
           "type": "application",
           "hasDemo": false,
