@@ -7,6 +7,7 @@ import {
 } from './lib/auth/getLoginStatus';
 import { fetchArboristResources } from './lib/auth/fetchAuthz';
 import { RouteConfig } from '@gen3/frontend/server';
+import { getTermsStatusFromCookie } from './lib/terms/placeholderTermsService';
 
 const WILDCARD_ROUTE_KEY = '*';
 
@@ -45,6 +46,15 @@ export async function middleware(req: NextRequest) {
     const loginUrl = new URL('/Login', req.url);
     loginUrl.searchParams.set('referer', pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  if (loggedIn && !getTermsStatusFromCookie(req.headers.get('Cookie') || '').accepted) {
+    const termsUrl = new URL('/TermsAcceptance', req.url);
+    termsUrl.searchParams.set(
+      'referer',
+      `${pathname}${req.nextUrl.search}`,
+    );
+    return NextResponse.redirect(termsUrl);
   }
 
   // If no authz resources configured, login is enough
