@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getAccessToken, getLoginStatus } from '@/lib/auth/getLoginStatus';
 import { fetchTermsStatus } from '@/lib/terms/termsService';
 import { TermsApiError } from '@/lib/terms/types';
+import { getRequestOriginFromApiRequest } from '@/lib/terms/requestOrigin';
 import { resolveUserIdentity } from '@/lib/terms/userEmail';
 
 export default async function handler(
@@ -13,6 +14,7 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const requestOrigin = getRequestOriginFromApiRequest(req);
   const loginStatus = await getLoginStatus(req.headers.cookie);
 
   if (loginStatus.status !== 'issued') {
@@ -25,7 +27,7 @@ export default async function handler(
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  const identity = await resolveUserIdentity(req.headers.cookie);
+  const identity = await resolveUserIdentity(req.headers.cookie, requestOrigin);
 
   if (!identity.email) {
     return res.status(401).json({
@@ -35,7 +37,7 @@ export default async function handler(
   }
 
   try {
-    const status = await fetchTermsStatus(accessToken, identity);
+    const status = await fetchTermsStatus(accessToken, identity, requestOrigin);
 
     return res.status(200).json({
       ...status,

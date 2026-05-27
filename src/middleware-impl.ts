@@ -29,9 +29,22 @@ export async function middleware(req: NextRequest) {
     const loginStatus = await getLoginStatus(cookieHeader);
 
     if (loginStatus.status === 'issued') {
-      const termsGate = await getTermsGateResult(cookieHeader);
+      try {
+        const termsGate = await getTermsGateResult(
+          cookieHeader,
+          req.nextUrl.origin,
+        );
 
-      if (!termsGate.hasAcceptedLatestTerms) {
+        if (!termsGate.hasAcceptedLatestTerms) {
+          const termsUrl = new URL('/TermsAcceptance', req.url);
+          termsUrl.searchParams.set(
+            'referer',
+            getSafeReferer(`${pathname}${req.nextUrl.search}`),
+          );
+          return NextResponse.redirect(termsUrl);
+        }
+      } catch (error) {
+        console.error('terms middleware check failed:', error);
         const termsUrl = new URL('/TermsAcceptance', req.url);
         termsUrl.searchParams.set(
           'referer',

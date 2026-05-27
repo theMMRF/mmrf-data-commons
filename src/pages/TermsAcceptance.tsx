@@ -23,6 +23,7 @@ import {
 } from '@/lib/terms/client';
 import { getTermsGateResult, fetchCurrentTerms } from '@/lib/terms/termsService';
 import { getSafeReferer } from '@/lib/terms/referer';
+import { getRequestOriginFromApiRequest } from '@/lib/terms/requestOrigin';
 import { resolveUserIdentity } from '@/lib/terms/userEmail';
 import type { TermsUiConfig, TermsVersion } from '@/lib/terms/types';
 
@@ -160,6 +161,7 @@ const TermsAcceptancePage = ({
 export const getServerSideProps: GetServerSideProps<
   TermsAcceptancePageProps
 > = async ({ req, query }) => {
+  const requestOrigin = getRequestOriginFromApiRequest(req);
   const loginStatus = await getLoginStatus(req.headers.cookie);
 
   if (loginStatus.status !== 'issued') {
@@ -173,8 +175,8 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 
-  const termsGate = await getTermsGateResult(req.headers.cookie);
-  const identity = await resolveUserIdentity(req.headers.cookie);
+  const termsGate = await getTermsGateResult(req.headers.cookie, requestOrigin);
+  const identity = await resolveUserIdentity(req.headers.cookie, requestOrigin);
 
   const identityError = identity.email
     ? null
@@ -201,7 +203,7 @@ export const getServerSideProps: GetServerSideProps<
   }
 
   try {
-    const currentTerms = await fetchCurrentTerms();
+    const currentTerms = await fetchCurrentTerms(requestOrigin);
 
     return {
       props: {
