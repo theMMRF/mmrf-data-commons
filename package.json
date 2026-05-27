@@ -9,9 +9,7 @@
   "scripts": {
     "lint": "next lint",
     "lint-fix": "next lint --fix",
-    "predev": " NODE_ENV=development npm run build:middlewarePaths",
     "dev": "next dev --turbopack",
-    "prebuild": "NODE_ENV=production npm run build:middlewarePaths",
     "build": "NODE_OPTIONS=--max-old-space-size=8192 next build",
     "start": "next start",
     "storybook": "storybook dev -p 6006",

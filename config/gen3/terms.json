@@ -1,8 +1,7 @@
 {
-  "version": "2026-05-20",
-  "effectiveDate": "May 20, 2026",
-  "title": "Updated Terms and Conditions",
-  "summary": "We have updated our terms and conditions. Please review and accept the current terms before continuing to the MMRF Data Commons.",
-  "acceptanceText": "I accept the updated terms and conditions.",
-  "termsUrl": "https://themmrf.org/terms-and-conditions/"
+  "title": "Terms and Conditions",
+  "intro": "Please review and accept the terms below to continue.",
+  "acceptanceText": "I have read and agree to the Terms and Conditions.",
+  "submitButtonText": "Accept",
+  "externalLinkText": "View full terms"
 }

@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getLoginStatus } from '@/lib/auth/getLoginStatus';
-import { getTermsStatusFromCookie } from '@/lib/terms/placeholderTermsService';
+import { getAccessToken, getLoginStatus } from '@/lib/auth/getLoginStatus';
+import { fetchTermsStatus } from '@/lib/terms/termsService';
+import { TermsApiError } from '@/lib/terms/types';
+import { resolveUserIdentity } from '@/lib/terms/userEmail';
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,8 +19,36 @@ export default async function handler(
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  return res.status(200).json({
-    ...getTermsStatusFromCookie(req.headers.cookie),
-    user: loginStatus.userContext,
-  });
+  const accessToken = getAccessToken(req.headers.cookie);
+
+  if (!accessToken) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const identity = await resolveUserIdentity(req.headers.cookie);
+
+  if (!identity.email) {
+    return res.status(401).json({
+      error:
+        'Unable to determine the authenticated user email for terms acceptance',
+    });
+  }
+
+  try {
+    const status = await fetchTermsStatus(accessToken, identity);
+
+    return res.status(200).json({
+      ...status,
+      user: loginStatus.userContext,
+    });
+  } catch (error) {
+    if (error instanceof TermsApiError) {
+      return res.status(error.status).json({
+        error: error.detail ?? error.message,
+      });
+    }
+
+    console.error('terms status API error:', error);
+    return res.status(503).json({ error: 'Unable to check terms acceptance status' });
+  }
 }
