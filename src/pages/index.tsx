@@ -27,10 +27,6 @@ import { useDeepCompareEffect } from 'use-deep-compare';
 import { getCustomCohortButtons } from '@/features/cohort/getCustomCohortButtons';
 import { useProjectId } from '@/hooks/useAppFilters';
 import { formatGeneSymbol } from '@/utils/formatQueryExpressionValues';
-import { getLoginStatus } from '@/lib/auth/getLoginStatus';
-import { getTermsStatusFromCookie } from '@/lib/terms/placeholderTermsService';
-import { activeTermsConfig, type TermsConfig } from '@/lib/terms/config';
-import TermsAcceptancePage from './TermsAcceptance';
 
 const PROD_HOSTNAME = 'virtuallab.themmrf.org';
 const PROD_HIDDEN_APP_IDS = new Set([
@@ -47,8 +43,6 @@ interface CountsPanelProps {
 
 interface ToolsPageProps extends Partial<AnalysisPageLayoutProps> {
   hideProdOnlyTools?: boolean;
-  termsAcceptanceRequired?: boolean;
-  termsConfig?: TermsConfig;
 }
 
 const getRequestHostname = (header?: string | string[]) => {
@@ -97,8 +91,6 @@ const Tools = ({
   sections,
   classNames,
   hideProdOnlyTools = false,
-  termsAcceptanceRequired = false,
-  termsConfig,
 }: ToolsPageProps) => {
   const router = useRouter();
   const {
@@ -144,10 +136,6 @@ const Tools = ({
   };
 
   const projectId = useProjectId();
-
-  if (termsAcceptanceRequired && termsConfig) {
-    return <TermsAcceptancePage termsConfig={termsConfig} />;
-  }
 
   return (
     <>
@@ -203,18 +191,6 @@ export default Tools;
 export const getServerSideProps: GetServerSideProps<ToolsPageProps> = async (
   context,
 ) => {
-  const loginStatus = await getLoginStatus(context.req.headers.cookie);
-  const termsStatus = getTermsStatusFromCookie(context.req.headers.cookie);
-
-  if (loginStatus.status === 'issued' && !termsStatus.accepted) {
-    return {
-      props: {
-        termsAcceptanceRequired: true,
-        termsConfig: activeTermsConfig,
-      },
-    };
-  }
-
   const result = await baseGetServerSideProps(context);
 
   if (!('props' in result)) return result;

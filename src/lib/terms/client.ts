@@ -1,19 +1,44 @@
-import { activeTermsConfig } from './config';
-import type { TermsStatus } from './placeholderTermsService';
+import type {
+  TermsAcceptanceResult,
+  TermsStatus,
+} from './types';
+
+export class TermsClientError extends Error {
+  status: number;
+
+  currentTerms?: TermsStatus['currentTerms'];
+
+  constructor(
+    message: string,
+    status: number,
+    currentTerms?: TermsStatus['currentTerms'],
+  ) {
+    super(message);
+    this.name = 'TermsClientError';
+    this.status = status;
+    this.currentTerms = currentTerms;
+  }
+}
 
 export const fetchTermsStatus = async (): Promise<TermsStatus> => {
   const response = await fetch('/api/terms/status');
 
   if (!response.ok) {
-    throw new Error('Unable to check terms acceptance status');
+    const body = (await response.json().catch(() => ({}))) as { error?: string };
+    throw new TermsClientError(
+      body.error ?? 'Unable to check terms acceptance status',
+      response.status,
+    );
   }
 
   return response.json() as Promise<TermsStatus>;
 };
 
-export const acceptActiveTerms = async (): Promise<TermsStatus> => {
+export const acceptActiveTerms = async (
+  termsVersionId: number,
+): Promise<TermsAcceptanceResult> => {
   const response = await fetch('/api/terms/accept', {
-    body: JSON.stringify({ termsVersion: activeTermsConfig.version }),
+    body: JSON.stringify({ termsVersionId }),
     headers: {
       'Content-Type': 'application/json',
     },
@@ -21,8 +46,20 @@ export const acceptActiveTerms = async (): Promise<TermsStatus> => {
   });
 
   if (!response.ok) {
-    throw new Error('Unable to record terms acceptance');
+    const body = (await response.json().catch(() => ({}))) as {
+      error?: string;
+      currentTerms?: TermsStatus['currentTerms'];
+    };
+
+    throw new TermsClientError(
+      body.error ??
+        (response.status === 409
+          ? 'The terms were updated while you were reviewing them. Please review the latest version and accept again.'
+          : 'Unable to record terms acceptance'),
+      response.status,
+      body.currentTerms,
+    );
   }
 
-  return response.json() as Promise<TermsStatus>;
+  return response.json() as Promise<TermsAcceptanceResult>;
 };

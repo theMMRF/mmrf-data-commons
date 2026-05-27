@@ -1,10 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getLoginStatus } from '@/lib/auth/getLoginStatus';
-import {
-  createTermsAcceptanceCookie,
-  getTermsStatusFromCookie,
-} from '@/lib/terms/placeholderTermsService';
-import { activeTermsConfig } from '@/lib/terms/config';
+import { getAccessToken, getLoginStatus } from '@/lib/auth/getLoginStatus';
+import { acceptTerms } from '@/lib/terms/termsService';
+import { TermsApiError } from '@/lib/terms/types';
+import { resolveUserIdentity } from '@/lib/terms/userEmail';
 
 export default async function handler(
   req: NextApiRequest,
@@ -21,23 +19,48 @@ export default async function handler(
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  const requestedVersion =
-    typeof req.body?.termsVersion === 'string' ? req.body.termsVersion : null;
+  const accessToken = getAccessToken(req.headers.cookie);
 
-  if (requestedVersion !== activeTermsConfig.version) {
-    return res.status(400).json({
-      error: 'Terms version does not match the active terms version',
-      activeVersion: activeTermsConfig.version,
+  if (!accessToken) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const identity = await resolveUserIdentity(req.headers.cookie);
+
+  if (!identity.email) {
+    return res.status(401).json({
+      error:
+        'Unable to determine the authenticated user email for terms acceptance',
     });
   }
 
-  res.setHeader('Set-Cookie', createTermsAcceptanceCookie());
+  const termsVersionId =
+    typeof req.body?.termsVersionId === 'number'
+      ? req.body.termsVersionId
+      : typeof req.body?.termsVersionId === 'string'
+        ? Number.parseInt(req.body.termsVersionId, 10)
+        : NaN;
 
-  return res.status(200).json({
-    ...getTermsStatusFromCookie(
-      `${req.headers.cookie ?? ''}; mmrf-terms-accepted-version=${activeTermsConfig.version}`,
-    ),
-    acceptedAt: new Date().toISOString(),
-    user: loginStatus.userContext,
-  });
+  if (!Number.isFinite(termsVersionId)) {
+    return res.status(400).json({ error: 'termsVersionId is required' });
+  }
+
+  try {
+    const result = await acceptTerms(accessToken, termsVersionId, identity);
+
+    return res.status(200).json({
+      ...result,
+      user: loginStatus.userContext,
+    });
+  } catch (error) {
+    if (error instanceof TermsApiError) {
+      return res.status(error.status).json({
+        currentTerms: error.currentTerms,
+        error: error.detail ?? error.message,
+      });
+    }
+
+    console.error('terms accept API error:', error);
+    return res.status(503).json({ error: 'Unable to record terms acceptance' });
+  }
 }
