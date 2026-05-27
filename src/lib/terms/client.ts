@@ -1,3 +1,4 @@
+import { withClientBasePath } from '@/lib/basePath';
 import type {
   TermsAcceptanceResult,
   TermsStatus,
@@ -21,7 +22,9 @@ export class TermsClientError extends Error {
 }
 
 export const fetchTermsStatus = async (): Promise<TermsStatus> => {
-  const response = await fetch('/api/terms/status');
+  const response = await fetch(withClientBasePath('/api/terms/status'), {
+    credentials: 'include',
+  });
 
   if (!response.ok) {
     const body = (await response.json().catch(() => ({}))) as { error?: string };
@@ -37,8 +40,9 @@ export const fetchTermsStatus = async (): Promise<TermsStatus> => {
 export const acceptActiveTerms = async (
   termsVersionId: number,
 ): Promise<TermsAcceptanceResult> => {
-  const response = await fetch('/api/terms/accept', {
+  const response = await fetch(withClientBasePath('/api/terms/accept'), {
     body: JSON.stringify({ termsVersionId }),
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },

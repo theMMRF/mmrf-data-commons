@@ -1,6 +1,16 @@
 import { decodeJwt } from 'jose';
+import { GEN3_API } from '@gen3/core/server';
 import { getAccessToken, getLoginStatus } from '@/lib/auth/getLoginStatus';
 import { buildAbsoluteGen3Url } from './requestOrigin';
+
+const normalizeBase = (value?: string): string | undefined => {
+  const normalized = value?.trim().replace(/\/$/, '');
+  if (!normalized?.startsWith('http')) {
+    return undefined;
+  }
+
+  return normalized;
+};
 
 const extractEmailFromUserRecord = (
   user?: Record<string, unknown> | null,
@@ -52,7 +62,10 @@ export const fetchUserProfile = async (
   accessToken: string,
   requestOrigin?: string,
 ): Promise<Record<string, unknown> | null> => {
-  const profileUrl = buildAbsoluteGen3Url('/user/user', requestOrigin);
+  const gen3ApiBase = normalizeBase(typeof GEN3_API === 'string' ? GEN3_API : undefined);
+  const profileUrl =
+    buildAbsoluteGen3Url('/user/user', requestOrigin) ??
+    (gen3ApiBase ? `${gen3ApiBase}/user/user` : undefined);
 
   if (!profileUrl) {
     return null;
