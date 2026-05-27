@@ -1,9 +1,21 @@
+import { GEN3_API } from '@gen3/core/server';
 import { resolveAbsoluteGen3ApiBase } from './requestOrigin';
 
+const normalizeBase = (value?: string): string | undefined => {
+  const normalized = value?.trim().replace(/\/$/, '');
+  if (!normalized?.startsWith('http')) {
+    return undefined;
+  }
+
+  return normalized;
+};
+
 /**
- * Edge-safe Gen3 Analysis API base URL (no @gen3/core imports).
+ * Gen3 Analysis API base URL for Node.js server routes (API handlers, SSR).
  */
-export const getGen3AnalysisApiUrl = (requestOrigin?: string): string | undefined => {
+export const getGen3AnalysisApiUrl = (
+  requestOrigin?: string,
+): string | undefined => {
   const configuredAnalysisApi = process.env.NEXT_PUBLIC_GEN3_ANALYSIS_API?.replace(
     /\/$/,
     '',
@@ -11,6 +23,18 @@ export const getGen3AnalysisApiUrl = (requestOrigin?: string): string | undefine
 
   if (configuredAnalysisApi?.startsWith('http')) {
     return configuredAnalysisApi;
+  }
+
+  const gen3Api =
+    normalizeBase(typeof GEN3_API === 'string' ? GEN3_API : undefined) ??
+    normalizeBase(process.env.NEXT_PUBLIC_GEN3_API);
+
+  if (gen3Api) {
+    if (configuredAnalysisApi?.startsWith('/')) {
+      return `${gen3Api}${configuredAnalysisApi}`;
+    }
+
+    return `${gen3Api}/analysis/v0`;
   }
 
   const apiBase = resolveAbsoluteGen3ApiBase(requestOrigin);

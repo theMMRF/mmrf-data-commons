@@ -8,8 +8,8 @@ import {
 import { fetchArboristResources } from './lib/auth/fetchAuthz';
 import { RouteConfig } from '@gen3/frontend/server';
 import { isExemptFromTermsCheck } from './lib/terms/exemptPaths';
+import { fetchTermsAcceptedFromBff } from './lib/terms/middlewareTermsCheck';
 import { getSafeReferer } from './lib/terms/referer';
-import { getTermsGateResult } from './lib/terms/termsService';
 
 const WILDCARD_ROUTE_KEY = '*';
 
@@ -29,22 +29,9 @@ export async function middleware(req: NextRequest) {
     const loginStatus = await getLoginStatus(cookieHeader);
 
     if (loginStatus.status === 'issued') {
-      try {
-        const termsGate = await getTermsGateResult(
-          cookieHeader,
-          req.nextUrl.origin,
-        );
+      const termsGate = await fetchTermsAcceptedFromBff(req);
 
-        if (!termsGate.hasAcceptedLatestTerms) {
-          const termsUrl = new URL('/TermsAcceptance', req.url);
-          termsUrl.searchParams.set(
-            'referer',
-            getSafeReferer(`${pathname}${req.nextUrl.search}`),
-          );
-          return NextResponse.redirect(termsUrl);
-        }
-      } catch (error) {
-        console.error('terms middleware check failed:', error);
+      if (termsGate.isLoggedIn && !termsGate.hasAcceptedLatestTerms) {
         const termsUrl = new URL('/TermsAcceptance', req.url);
         termsUrl.searchParams.set(
           'referer',
