@@ -1,20 +1,26 @@
+import { resolveAbsoluteGen3ApiBase } from './requestOrigin';
+
 /**
  * Edge-safe Gen3 Analysis API base URL (no @gen3/core imports).
- *
- * Server-side callers (middleware, SSR, API routes) should reach the backend
- * directly via NEXT_PUBLIC_GEN3_API_TARGET when available, avoiding a loop
- * through Next.js middleware on localhost proxy paths.
  */
-export const getGen3AnalysisApiUrl = (): string => {
-  if (process.env.NEXT_PUBLIC_GEN3_ANALYSIS_API) {
-    return process.env.NEXT_PUBLIC_GEN3_ANALYSIS_API.replace(/\/$/, '');
+export const getGen3AnalysisApiUrl = (requestOrigin?: string): string | undefined => {
+  const configuredAnalysisApi = process.env.NEXT_PUBLIC_GEN3_ANALYSIS_API?.replace(
+    /\/$/,
+    '',
+  );
+
+  if (configuredAnalysisApi?.startsWith('http')) {
+    return configuredAnalysisApi;
   }
 
-  const apiTarget = process.env.NEXT_PUBLIC_GEN3_API_TARGET?.replace(/\/$/, '');
-  if (apiTarget) {
-    return `${apiTarget}/analysis/v0`;
+  const apiBase = resolveAbsoluteGen3ApiBase(requestOrigin);
+  if (!apiBase) {
+    return undefined;
   }
 
-  const gen3Api = process.env.NEXT_PUBLIC_GEN3_API?.replace(/\/$/, '') ?? '';
-  return `${gen3Api}/analysis/v0`;
+  if (configuredAnalysisApi?.startsWith('/')) {
+    return `${apiBase}${configuredAnalysisApi}`;
+  }
+
+  return `${apiBase}/analysis/v0`;
 };

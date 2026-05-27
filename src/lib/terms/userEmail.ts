@@ -1,14 +1,6 @@
 import { decodeJwt } from 'jose';
 import { getAccessToken, getLoginStatus } from '@/lib/auth/getLoginStatus';
-
-const getGen3ApiBase = (): string => {
-  const apiTarget = process.env.NEXT_PUBLIC_GEN3_API_TARGET?.replace(/\/$/, '');
-  if (apiTarget) {
-    return apiTarget;
-  }
-
-  return process.env.NEXT_PUBLIC_GEN3_API?.replace(/\/$/, '') ?? '';
-};
+import { buildAbsoluteGen3Url } from './requestOrigin';
 
 const extractEmailFromUserRecord = (
   user?: Record<string, unknown> | null,
@@ -58,8 +50,15 @@ export interface ResolvedUserIdentity {
 
 export const fetchUserProfile = async (
   accessToken: string,
+  requestOrigin?: string,
 ): Promise<Record<string, unknown> | null> => {
-  const response = await fetch(`${getGen3ApiBase()}/user/user`, {
+  const profileUrl = buildAbsoluteGen3Url('/user/user', requestOrigin);
+
+  if (!profileUrl) {
+    return null;
+  }
+
+  const response = await fetch(profileUrl, {
     cache: 'no-store',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -75,6 +74,7 @@ export const fetchUserProfile = async (
 
 export const resolveUserIdentity = async (
   cookieHeader?: string,
+  requestOrigin?: string,
 ): Promise<ResolvedUserIdentity> => {
   const loginStatus = await getLoginStatus(cookieHeader);
   const fromContextEmail = extractEmailFromUserRecord(loginStatus.userContext);
@@ -95,29 +95,30 @@ export const resolveUserIdentity = async (
 
   try {
     const decoded = decodeJwt(accessToken) as Record<string, unknown>;
+    const contextUser = (
+      decoded.context as { user?: Record<string, unknown> } | undefined
+    )?.user;
+
     const decodedEmail =
       (typeof decoded.email === 'string' && decoded.email) ||
-      extractEmailFromUserRecord(
-        decoded.context as Record<string, unknown> | undefined,
-      ) ||
-      extractEmailFromUserRecord(
-        (decoded.context as { user?: Record<string, unknown> } | undefined)
-          ?.user,
-      );
+      (typeof decoded.preferred_username === 'string' &&
+        decoded.preferred_username) ||
+      extractEmailFromUserRecord(contextUser);
 
     if (decodedEmail) {
       return {
         email: decodedEmail,
         name:
           fromContextName ||
-          (typeof decoded.name === 'string' ? decoded.name : undefined),
+          (typeof decoded.name === 'string' ? decoded.name : undefined) ||
+          extractNameFromUserRecord(contextUser),
       };
     }
   } catch {
     // Fall through to the user profile API.
   }
 
-  const profile = await fetchUserProfile(accessToken);
+  const profile = await fetchUserProfile(accessToken, requestOrigin);
 
   return {
     email: extractEmailFromUserRecord(profile),

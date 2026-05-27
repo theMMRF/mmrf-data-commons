@@ -14,7 +14,19 @@ import {
 } from './types';
 import { resolveUserIdentity, type ResolvedUserIdentity } from './userEmail';
 
-const termsApiBase = () => getGen3AnalysisApiUrl();
+const requireTermsApiBase = (requestOrigin?: string): string => {
+  const base = getGen3AnalysisApiUrl(requestOrigin);
+
+  if (!base) {
+    throw new TermsApiError(
+      'Unable to resolve terms API URL',
+      503,
+      'Unable to resolve terms API URL',
+    );
+  }
+
+  return base;
+};
 
 const buildAuthHeaders = (
   accessToken: string,
@@ -52,8 +64,9 @@ const parseErrorDetail = async (response: Response): Promise<string | undefined>
 export const fetchTermsStatus = async (
   accessToken: string,
   identity?: ResolvedUserIdentity,
+  requestOrigin?: string,
 ): Promise<TermsStatus> => {
-  const response = await fetch(`${termsApiBase()}/terms/status`, {
+  const response = await fetch(`${requireTermsApiBase(requestOrigin)}/terms/status`, {
     cache: 'no-store',
     headers: buildAuthHeaders(accessToken, identity),
   });
@@ -71,8 +84,10 @@ export const fetchTermsStatus = async (
   return mapTermsStatusResponse(data);
 };
 
-export const fetchCurrentTerms = async (): Promise<TermsVersion> => {
-  const response = await fetch(`${termsApiBase()}/terms/current`, {
+export const fetchCurrentTerms = async (
+  requestOrigin?: string,
+): Promise<TermsVersion> => {
+  const response = await fetch(`${requireTermsApiBase(requestOrigin)}/terms/current`, {
     cache: 'no-store',
   });
 
@@ -99,8 +114,9 @@ export const acceptTerms = async (
   accessToken: string,
   termsVersionId: number,
   identity?: ResolvedUserIdentity,
+  requestOrigin?: string,
 ): Promise<TermsAcceptanceResult> => {
-  const response = await fetch(`${termsApiBase()}/terms/acceptances`, {
+  const response = await fetch(`${requireTermsApiBase(requestOrigin)}/terms/acceptances`, {
     body: JSON.stringify({ terms_version_id: termsVersionId }),
     cache: 'no-store',
     headers: {
@@ -115,7 +131,7 @@ export const acceptTerms = async (
     let currentTerms: TermsVersion | undefined;
 
     try {
-      currentTerms = await fetchCurrentTerms();
+      currentTerms = await fetchCurrentTerms(requestOrigin);
     } catch {
       currentTerms = undefined;
     }
@@ -143,6 +159,7 @@ export const acceptTerms = async (
 
 export const getTermsGateResult = async (
   cookieHeader?: string,
+  requestOrigin?: string,
 ): Promise<TermsGateResult> => {
   const loginStatus = await getLoginStatus(cookieHeader);
 
@@ -163,10 +180,10 @@ export const getTermsGateResult = async (
     };
   }
 
-  const identity = await resolveUserIdentity(cookieHeader);
+  const identity = await resolveUserIdentity(cookieHeader, requestOrigin);
 
   try {
-    const status = await fetchTermsStatus(accessToken, identity);
+    const status = await fetchTermsStatus(accessToken, identity, requestOrigin);
 
     return {
       currentTerms: status.currentTerms,
@@ -177,7 +194,7 @@ export const getTermsGateResult = async (
     let currentTerms: TermsVersion | undefined;
 
     try {
-      currentTerms = await fetchCurrentTerms();
+      currentTerms = await fetchCurrentTerms(requestOrigin);
     } catch {
       currentTerms = undefined;
     }
