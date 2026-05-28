@@ -10,6 +10,7 @@ const TERMS_EXEMPT_PATH_PREFIXES = [
   '/404',
   '/api/auth',
   '/api/terms',
+  '/analysis/v0/terms',
   '/_status',
   '/user',
   '/authz',

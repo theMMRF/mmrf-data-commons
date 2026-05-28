@@ -1,11 +1,8 @@
 import {
-  mapTermsAcceptanceResponse,
-  mapTermsStatusResponse,
-  type ApiTermsAcceptanceResponse,
-  type ApiTermsStatusResponse,
   TermsAcceptanceResult,
   TermsStatus,
 } from './types';
+import { withClientBasePath } from '@/lib/basePath';
 
 export class TermsClientError extends Error {
   status: number;
@@ -23,39 +20,6 @@ export class TermsClientError extends Error {
     this.currentTerms = currentTerms;
   }
 }
-
-const getClientTermsApiBase = (): string => {
-  const configured = process.env.NEXT_PUBLIC_GEN3_ANALYSIS_API
-    ?.trim()
-    .replace(/\/$/, '');
-
-  return configured || '/analysis/v0';
-};
-
-const getCookieValue = (name: string): string | undefined => {
-  if (typeof document === 'undefined') return undefined;
-
-  const cookies = document.cookie.split(';');
-  for (const cookie of cookies) {
-    const [rawKey, ...rawValue] = cookie.split('=');
-    if (rawKey?.trim() === name) {
-      return decodeURIComponent(rawValue.join('='));
-    }
-  }
-
-  return undefined;
-};
-
-const ensureCsrfToken = async (): Promise<string | undefined> => {
-  const existingToken = getCookieValue('csrftoken');
-  if (existingToken) return existingToken;
-
-  await fetch('/_status', {
-    credentials: 'include',
-  }).catch(() => undefined);
-
-  return getCookieValue('csrftoken');
-};
 
 const parseTermsError = async (
   response: Response,
@@ -84,7 +48,7 @@ const parseTermsError = async (
 };
 
 export const fetchTermsStatus = async (): Promise<TermsStatus> => {
-  const response = await fetch(`${getClientTermsApiBase()}/terms/status`, {
+  const response = await fetch(withClientBasePath('/api/terms/status'), {
     credentials: 'include',
   });
 
@@ -96,19 +60,17 @@ export const fetchTermsStatus = async (): Promise<TermsStatus> => {
     );
   }
 
-  return mapTermsStatusResponse((await response.json()) as ApiTermsStatusResponse);
+  return response.json() as Promise<TermsStatus>;
 };
 
 export const acceptActiveTerms = async (
   termsVersionId: number,
 ): Promise<TermsAcceptanceResult> => {
-  const csrfToken = await ensureCsrfToken();
-  const response = await fetch(`${getClientTermsApiBase()}/terms/acceptances`, {
-    body: JSON.stringify({ terms_version_id: termsVersionId }),
+  const response = await fetch(withClientBasePath('/api/terms/accept'), {
+    body: JSON.stringify({ termsVersionId }),
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
     },
     method: 'POST',
   });
@@ -126,7 +88,5 @@ export const acceptActiveTerms = async (
     );
   }
 
-  return mapTermsAcceptanceResponse(
-    (await response.json()) as ApiTermsAcceptanceResponse,
-  );
+  return response.json() as Promise<TermsAcceptanceResult>;
 };
