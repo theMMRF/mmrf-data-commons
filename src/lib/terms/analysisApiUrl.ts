@@ -16,17 +16,20 @@ const normalizeBase = (value?: string): string | undefined => {
 export const getGen3AnalysisApiUrl = (
   requestOrigin?: string,
 ): string | undefined => {
-  const configuredAnalysisApi = process.env.NEXT_PUBLIC_GEN3_ANALYSIS_API?.replace(
-    /\/$/,
-    '',
-  );
+  const configuredAnalysisApi = (
+    process.env.GEN3_ANALYSIS_API ??
+    process.env.NEXT_PUBLIC_GEN3_ANALYSIS_API
+  )?.replace(/\/$/, '');
 
   if (configuredAnalysisApi?.startsWith('http')) {
     return configuredAnalysisApi;
   }
 
   const gen3Api =
+    normalizeBase(process.env.GEN3_API_TARGET) ??
+    normalizeBase(process.env.GEN3_API) ??
     normalizeBase(typeof GEN3_API === 'string' ? GEN3_API : undefined) ??
+    normalizeBase(process.env.NEXT_PUBLIC_GEN3_API_TARGET) ??
     normalizeBase(process.env.NEXT_PUBLIC_GEN3_API);
 
   if (gen3Api) {
