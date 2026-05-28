@@ -1,5 +1,8 @@
-import { withClientBasePath } from '@/lib/basePath';
-import type {
+import {
+  mapTermsAcceptanceResponse,
+  mapTermsStatusResponse,
+  type ApiTermsAcceptanceResponse,
+  type ApiTermsStatusResponse,
   TermsAcceptanceResult,
   TermsStatus,
 } from './types';
@@ -21,27 +24,61 @@ export class TermsClientError extends Error {
   }
 }
 
+const getClientTermsApiBase = (): string => {
+  const configured = process.env.NEXT_PUBLIC_GEN3_ANALYSIS_API
+    ?.trim()
+    .replace(/\/$/, '');
+
+  return configured || '/analysis/v0';
+};
+
+const parseTermsError = async (
+  response: Response,
+): Promise<{ error?: string; currentTerms?: TermsStatus['currentTerms'] }> => {
+  try {
+    const body = (await response.json()) as {
+      currentTerms?: TermsStatus['currentTerms'];
+      detail?: string | { msg?: string }[];
+      error?: string;
+    };
+
+    if (typeof body.error === 'string') {
+      return { currentTerms: body.currentTerms, error: body.error };
+    }
+    if (typeof body.detail === 'string') {
+      return { currentTerms: body.currentTerms, error: body.detail };
+    }
+    if (Array.isArray(body.detail) && body.detail[0]?.msg) {
+      return { currentTerms: body.currentTerms, error: body.detail[0].msg };
+    }
+
+    return { currentTerms: body.currentTerms };
+  } catch {
+    return {};
+  }
+};
+
 export const fetchTermsStatus = async (): Promise<TermsStatus> => {
-  const response = await fetch(withClientBasePath('/api/terms/status'), {
+  const response = await fetch(`${getClientTermsApiBase()}/terms/status`, {
     credentials: 'include',
   });
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => ({}))) as { error?: string };
+    const body = await parseTermsError(response);
     throw new TermsClientError(
       body.error ?? 'Unable to check terms acceptance status',
       response.status,
     );
   }
 
-  return response.json() as Promise<TermsStatus>;
+  return mapTermsStatusResponse((await response.json()) as ApiTermsStatusResponse);
 };
 
 export const acceptActiveTerms = async (
   termsVersionId: number,
 ): Promise<TermsAcceptanceResult> => {
-  const response = await fetch(withClientBasePath('/api/terms/accept'), {
-    body: JSON.stringify({ termsVersionId }),
+  const response = await fetch(`${getClientTermsApiBase()}/terms/acceptances`, {
+    body: JSON.stringify({ terms_version_id: termsVersionId }),
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
@@ -50,10 +87,7 @@ export const acceptActiveTerms = async (
   });
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => ({}))) as {
-      error?: string;
-      currentTerms?: TermsStatus['currentTerms'];
-    };
+    const body = await parseTermsError(response);
 
     throw new TermsClientError(
       body.error ??
@@ -65,5 +99,7 @@ export const acceptActiveTerms = async (
     );
   }
 
-  return response.json() as Promise<TermsAcceptanceResult>;
+  return mapTermsAcceptanceResponse(
+    (await response.json()) as ApiTermsAcceptanceResponse,
+  );
 };
