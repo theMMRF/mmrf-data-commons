@@ -32,6 +32,31 @@ const getClientTermsApiBase = (): string => {
   return configured || '/analysis/v0';
 };
 
+const getCookieValue = (name: string): string | undefined => {
+  if (typeof document === 'undefined') return undefined;
+
+  const cookies = document.cookie.split(';');
+  for (const cookie of cookies) {
+    const [rawKey, ...rawValue] = cookie.split('=');
+    if (rawKey?.trim() === name) {
+      return decodeURIComponent(rawValue.join('='));
+    }
+  }
+
+  return undefined;
+};
+
+const ensureCsrfToken = async (): Promise<string | undefined> => {
+  const existingToken = getCookieValue('csrftoken');
+  if (existingToken) return existingToken;
+
+  await fetch('/_status', {
+    credentials: 'include',
+  }).catch(() => undefined);
+
+  return getCookieValue('csrftoken');
+};
+
 const parseTermsError = async (
   response: Response,
 ): Promise<{ error?: string; currentTerms?: TermsStatus['currentTerms'] }> => {
@@ -77,11 +102,13 @@ export const fetchTermsStatus = async (): Promise<TermsStatus> => {
 export const acceptActiveTerms = async (
   termsVersionId: number,
 ): Promise<TermsAcceptanceResult> => {
+  const csrfToken = await ensureCsrfToken();
   const response = await fetch(`${getClientTermsApiBase()}/terms/acceptances`, {
     body: JSON.stringify({ terms_version_id: termsVersionId }),
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
     },
     method: 'POST',
   });
