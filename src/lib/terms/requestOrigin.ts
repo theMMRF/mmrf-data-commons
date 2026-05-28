@@ -15,8 +15,14 @@ const normalizeBase = (value?: string): string | undefined => {
 export const resolveAbsoluteGen3ApiBase = (
   requestOrigin?: string,
 ): string | undefined =>
+  normalizeBase(process.env.GEN3_API_TARGET) ??
+  normalizeBase(process.env.GEN3_API) ??
   normalizeBase(process.env.NEXT_PUBLIC_GEN3_API_TARGET) ??
   normalizeBase(process.env.NEXT_PUBLIC_GEN3_API) ??
+  normalizeBase(process.env.GEN3_ANALYSIS_API)?.replace(
+    /\/analysis\/v0$/,
+    '',
+  ) ??
   normalizeBase(process.env.NEXT_PUBLIC_GEN3_ANALYSIS_API)?.replace(
     /\/analysis\/v0$/,
     '',
