@@ -63,7 +63,7 @@ const fetchCsrfToken = async (): Promise<string | undefined> => {
 };
 
 export const fetchTermsStatus = async (): Promise<TermsStatus> => {
-  const response = await fetch(withClientBasePath('/api/terms/status'), {
+  const response = await fetch(withClientBasePath('/terms-api/status'), {
     credentials: 'include',
   });
 
@@ -82,7 +82,7 @@ export const acceptActiveTerms = async (
   termsVersionId: number,
 ): Promise<TermsAcceptanceResult> => {
   const csrfToken = await fetchCsrfToken();
-  const response = await fetch(withClientBasePath('/api/terms/accept'), {
+  const response = await fetch(withClientBasePath('/terms-api/accept'), {
     body: JSON.stringify({ termsVersionId }),
     credentials: 'include',
     headers: {

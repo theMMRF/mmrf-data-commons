@@ -20,6 +20,11 @@ const withMDX = require('@next/mdx')({
   },
 });
 
+const termsApiRewrites = [
+  { source: '/terms-api/status', destination: '/api/terms/status' },
+  { source: '/terms-api/accept', destination: '/api/terms/accept' },
+];
+
 // Next configuration with support for rewrting API to existing common services
 const nextConfig = {
   output: 'standalone',
@@ -45,6 +50,7 @@ const nextConfig = {
       const GEN3_TARGET =
         process.env.NEXT_PUBLIC_GEN3_API_TARGET || 'https://localhost';
       return [
+        ...termsApiRewrites,
         { source: '/_status', destination: `${GEN3_TARGET}/_status` },
         { source: '/user/:path*', destination: `${GEN3_TARGET}/user/:path*` },
         {
@@ -92,7 +98,7 @@ const nextConfig = {
         },
       ];
     } else {
-      return [];
+      return termsApiRewrites;
     }
   },
   async headers() {
