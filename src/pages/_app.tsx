@@ -36,7 +36,6 @@ import { registerMMRFTableCellRenderers } from "@/components/ExplorerCellRendere
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 import GoogleAnalyticsLoader from "@/components/GoogleAnalyticsLoader";
 import MainNavigation from "@/components/Navigation/MainNavigation/MainNavigation";
-import TermsAcceptanceGuard from "@/components/Terms/TermsAcceptanceGuard";
 import {
   acceptCookieConsent,
   dismissCookieConsentForSession,
@@ -123,9 +122,7 @@ const Gen3App = ({
             >
               <Gen3GDCCompatabilityProvider>
                 <MainNavigation />
-                <TermsAcceptanceGuard>
-                  <Component {...pageProps} />
-                </TermsAcceptanceGuard>
+                <Component {...pageProps} />
                 <GoogleAnalyticsLoader
                   enabled={cookieConsentState === 'accepted'}
                   gaMeasurementId={gaMeasurementId}

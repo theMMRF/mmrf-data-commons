@@ -62,7 +62,7 @@ const TermsAcceptancePage = ({
 
     try {
       await acceptActiveTerms(currentTerms.id);
-      await router.replace(referer);
+      window.location.assign(referer);
     } catch (err) {
       if (err instanceof TermsClientError && err.status === 409) {
         if (err.currentTerms) {
