@@ -47,6 +47,21 @@ const parseTermsError = async (
   }
 };
 
+const fetchCsrfToken = async (): Promise<string | undefined> => {
+  try {
+    const response = await fetch(withClientBasePath('/_status'), {
+      credentials: 'include',
+    });
+
+    if (!response.ok) return undefined;
+
+    const body = (await response.json()) as { csrf?: string };
+    return body.csrf;
+  } catch {
+    return undefined;
+  }
+};
+
 export const fetchTermsStatus = async (): Promise<TermsStatus> => {
   const response = await fetch(withClientBasePath('/api/terms/status'), {
     credentials: 'include',
@@ -66,11 +81,13 @@ export const fetchTermsStatus = async (): Promise<TermsStatus> => {
 export const acceptActiveTerms = async (
   termsVersionId: number,
 ): Promise<TermsAcceptanceResult> => {
+  const csrfToken = await fetchCsrfToken();
   const response = await fetch(withClientBasePath('/api/terms/accept'), {
     body: JSON.stringify({ termsVersionId }),
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
     },
     method: 'POST',
   });

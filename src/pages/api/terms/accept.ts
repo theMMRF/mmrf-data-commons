@@ -4,6 +4,7 @@ import { acceptTerms } from '@/lib/terms/termsService';
 import { TermsApiError } from '@/lib/terms/types';
 import { getRequestOriginFromApiRequest } from '@/lib/terms/requestOrigin';
 import { resolveUserIdentity } from '@/lib/terms/userEmail';
+import { getGen3AnalysisApiUrl } from '@/lib/terms/analysisApiUrl';
 
 export default async function handler(
   req: NextApiRequest,
@@ -61,6 +62,14 @@ export default async function handler(
     });
   } catch (error) {
     if (error instanceof TermsApiError) {
+      console.error('terms accept API backend error:', {
+        analysisApiBase: getGen3AnalysisApiUrl(requestOrigin),
+        detail: error.detail ?? error.message,
+        hasAccessToken: Boolean(accessToken),
+        hasEmail: Boolean(identity.email),
+        status: error.status,
+      });
+
       return res.status(error.status).json({
         currentTerms: error.currentTerms,
         error: error.detail ?? error.message,
