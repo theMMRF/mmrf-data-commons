@@ -103,7 +103,7 @@ const TermsAcceptancePage = ({
               <Title order={1}>{uiConfig.title}</Title>
               <Text c="dimmed">{uiConfig.intro}</Text>
               <Text c="dimmed" size="sm">
-                Effective {formatEffectiveDate(currentTerms.effectiveAt)}
+                Version {formatEffectiveDate(currentTerms.effectiveAt)}
               </Text>
             </Stack>
 
