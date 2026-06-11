@@ -9,9 +9,7 @@
   "scripts": {
     "lint": "next lint",
     "lint-fix": "next lint --fix",
-    "predev": " NODE_ENV=development npm run build:middlewarePaths",
     "dev": "next dev --turbopack",
-    "prebuild": "NODE_ENV=production npm run build:middlewarePaths",
     "build": "NODE_OPTIONS=--max-old-space-size=8192 next build",
     "start": "next start",
     "storybook": "storybook dev -p 6006",
@@ -46,6 +44,7 @@
     "file-saver": "^2.0.5",
     "globals": "^17.3.0",
     "idb": "^8.0.0",
+    "jose": "^6.1.0",
     "jsonpath-plus": "^10.3.0",
     "lodash": "^4.14.202",
     "modern-tar": "^0.7.3",

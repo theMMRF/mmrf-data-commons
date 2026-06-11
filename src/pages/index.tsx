@@ -41,7 +41,7 @@ interface CountsPanelProps {
   indexPrefix?: string;
 }
 
-interface ToolsPageProps extends AnalysisPageLayoutProps {
+interface ToolsPageProps extends Partial<AnalysisPageLayoutProps> {
   hideProdOnlyTools?: boolean;
 }
 
