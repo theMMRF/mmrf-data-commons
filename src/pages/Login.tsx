@@ -62,7 +62,7 @@ const FEATURES: ReadonlyArray<{
   {
     icon: '/icons/Computational Platform.svg',
     title: 'Computational Platform',
-    body: 'In-depth data analysis using RStudio and Jupyter Notebooks.',
+    body: 'In-depth data analysis using Jupyter Notebooks.',
   },
   {
     icon: '/icons/Data Download.svg',
@@ -205,10 +205,12 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
                 Access, visualize, and analyze multiple myeloma data.
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-white/85">
-                Intuitive tools for researchers, clinicians, and partners to
-                explore the MMRF&rsquo;s extensive catalog of patient-derived
-                clinical, genomic, and immune data &mdash; built to turn
-                real-world datasets into new insights and personalized treatment
+                The platform offers researchers, clinicians, and partners
+                intuitive tools to access, visualize, and analyze our extensive
+                catalog of patient-derived clinical, genomic, and immune data.
+                By making high-quality, real-world datasets more accessible,
+                Virtual Lab empowers the research community to generate new
+                insights, drive innovation, and advance personalized treatment
                 strategies.
               </p>
 
@@ -217,14 +219,14 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
                   href={APPLY_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center rounded-md bg-[#FCA88D] px-7 py-3 text-base font-semibold text-[#4d0231] no-underline shadow-sm transition-colors hover:bg-[#ffc0a8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#73004a]"
+                  className="inline-flex items-center justify-center rounded-md bg-[#FCA88D] px-8 py-3.5 text-base font-bold text-[#4d0231] no-underline shadow-[0_12px_30px_rgba(43,0,27,0.22)] transition-all hover:-translate-y-0.5 hover:bg-[#ffc0a8] hover:shadow-[0_16px_34px_rgba(43,0,27,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#73004a]"
                 >
                   Apply for access
                 </a>
                 <button
                   type="button"
                   onClick={handleSignIn}
-                  className="inline-flex items-center justify-center rounded-md border border-white/60 px-7 py-3 text-base font-semibold text-white no-underline transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#73004a]"
+                  className="inline-flex items-center justify-center rounded-md border border-white/55 bg-white/16 px-8 py-3.5 text-base font-bold text-white no-underline shadow-[0_12px_30px_rgba(43,0,27,0.18)] backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-white/75 hover:bg-white/24 hover:shadow-[0_16px_34px_rgba(43,0,27,0.24)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#73004a]"
                 >
                   Sign in
                 </button>
