@@ -1,15 +1,47 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
+import { useRouter } from 'next/router';
 import {
   LoginPanel,
   LoginConfig,
   LoginPageGetServerSideProps as getServerSideProps,
 } from '@gen3/frontend';
+import { useGetLoginProvidersQuery, GEN3_REDIRECT_URL } from '@gen3/core';
 import PageTitle from '@/components/PageTitle';
 import { withClientBasePath } from '@/lib/basePath';
 
 const APPLY_URL =
   'https://mmrf.formstack.com/forms/mmrf_virtual_lab_access_request';
 const CONTACT_EMAIL = 'VirtualLab@themmrf.org';
+
+interface LoginProvidersData {
+  default_provider?: { name?: string; urls?: { url: string; name: string }[] };
+  providers?: { name: string; urls: { url: string; name: string }[] }[];
+}
+
+// Mirrors the redirect handling used by @gen3/frontend's LoginPanel so the
+// hero "Sign in" button performs the same login flow as the provider button.
+const appendParameterToUrl = (
+  url: string,
+  paramName: string,
+  paramValue: string,
+): string => {
+  if (!url || !paramName) return url;
+  const [baseUrl, hash] = url.split('#');
+  const hashFragment = hash ? `#${hash}` : '';
+  const separator = baseUrl.includes('?') ? '&' : '?';
+  return `${baseUrl}${separator}${encodeURIComponent(
+    paramName,
+  )}=${encodeURIComponent(paramValue)}${hashFragment}`;
+};
+
+const filterRedirect = (redirect?: string | string[]): string => {
+  let redirectPath = Array.isArray(redirect) ? redirect[0] : (redirect ?? '/');
+  if (redirectPath?.includes('Login')) redirectPath = '/';
+  if (!GEN3_REDIRECT_URL) return redirectPath;
+  const baseUrl = GEN3_REDIRECT_URL.replace(/\/+$/, '');
+  const cleanPath = redirectPath.replace(/^\/+/, '');
+  return cleanPath ? `${baseUrl}/${cleanPath}` : baseUrl;
+};
 
 // Copy mirrors themmrf.org/for-researchers/data-access-via-virtual-lab
 const FEATURES: ReadonlyArray<{
@@ -201,7 +233,7 @@ const BrowserFrame = ({ children }: { children: React.ReactNode }) => (
       <span className="h-2.5 w-2.5 rounded-full bg-[#f1c453]" />
       <span className="h-2.5 w-2.5 rounded-full bg-[#9fd6a0]" />
       <span className="ml-3 truncate rounded-md bg-white px-3 py-1 text-[10px] font-medium text-[#6b6b6b]">
-        virtual-lab.themmrf.org
+        virtuallab.themmrf.org
       </span>
     </div>
     {children}
@@ -209,6 +241,21 @@ const BrowserFrame = ({ children }: { children: React.ReactNode }) => (
 );
 
 export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
+  const router = useRouter();
+  const { data } = useGetLoginProvidersQuery();
+  const providers = data as LoginProvidersData | undefined;
+  const signInUrl = providers?.default_provider?.urls?.[0]?.url;
+  const isDev = process.env.NODE_ENV === 'development';
+  const [showDevLogin, setShowDevLogin] = useState(false);
+
+  const handleSignIn = useCallback(() => {
+    if (!signInUrl) return;
+    const target = router.query.redirect ?? router.query.referer;
+    router.push(
+      appendParameterToUrl(signInUrl, 'redirect', filterRedirect(target)),
+    );
+  }, [router, signInUrl]);
+
   return (
     <>
       <PageTitle pageName="Login Page" />
@@ -256,12 +303,13 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
                 >
                   Apply for access
                 </a>
-                <a
-                  href="#signin"
+                <button
+                  type="button"
+                  onClick={handleSignIn}
                   className="inline-flex items-center justify-center rounded-md border border-white/60 px-7 py-3 text-base font-semibold text-white no-underline transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#73004a]"
                 >
                   Sign in
-                </a>
+                </button>
               </div>
             </div>
 
@@ -272,9 +320,6 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
                          alt="Virtual Lab in use" className="w-full" /> */}
                 <PlatformPreview />
               </BrowserFrame>
-              <span className="absolute -bottom-3 left-4 rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[#8b0053] shadow-md">
-                Platform preview
-              </span>
             </div>
           </div>
         </section>
@@ -322,36 +367,10 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
           </div>
         </section>
 
-        {/* ---------- Sign in ---------- */}
-        <section
-          id="signin"
-          className="scroll-mt-28 border-t border-[#e7e5e2] bg-[#f4f3f1]"
-        >
-          <div className="mx-auto max-w-3xl px-6 py-16 lg:py-20">
-            <div className="text-center">
-              <h2 className="font-heading text-3xl font-bold text-[#20313B]">
-                Sign in to Virtual Lab
-              </h2>
-              <p className="mt-3 text-base text-[#5a5a5a]">
-                Use your institutional or approved credentials to continue.{' '}
-                Don&rsquo;t have access yet?{' '}
-                <a
-                  href={APPLY_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-[#8b0053] underline-offset-2 hover:underline"
-                >
-                  Apply for access
-                </a>
-                .
-              </p>
-            </div>
-
-            <div className="mt-10 rounded-xl border border-[#e7e5e2] bg-white p-2 shadow-sm sm:p-4">
-              <LoginPanel {...loginConfig} />
-            </div>
-
-            <p className="mt-8 text-center text-sm text-[#5a5a5a]">
+        {/* ---------- Contact ---------- */}
+        <section className="border-t border-[#e7e5e2] bg-[#f4f3f1]">
+          <div className="mx-auto max-w-3xl px-6 py-12 text-center">
+            <p className="text-sm text-[#5a5a5a]">
               Questions about access or registration? Contact{' '}
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
@@ -361,6 +380,25 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
               </a>
               .
             </p>
+
+            {/* Developer-only credentials login. Available only in local dev and
+                hidden by default so it stays out of marketing screenshots. */}
+            {isDev && (
+              <div className="mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowDevLogin((v) => !v)}
+                  className="text-xs font-medium text-[#9a8fa0] underline-offset-2 hover:text-[#8b0053] hover:underline"
+                >
+                  {showDevLogin ? 'Hide developer login' : 'Developer login'}
+                </button>
+                {showDevLogin && (
+                  <div className="mx-auto mt-4 max-w-xl rounded-xl border border-[#e7e5e2] bg-white p-4 text-left shadow-sm">
+                    <LoginPanel {...loginConfig} />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </section>
       </main>
