@@ -219,6 +219,7 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
                   href={APPLY_URL}
                   target="_blank"
                   rel="noopener noreferrer"
+                  style={{ color: '#4d0231' }}
                   className="inline-flex items-center justify-center rounded-md bg-[#FCA88D] px-8 py-3.5 text-base font-bold text-[#4d0231] no-underline shadow-[0_12px_30px_rgba(43,0,27,0.22)] transition-all hover:-translate-y-0.5 hover:bg-[#ffc0a8] hover:shadow-[0_16px_34px_rgba(43,0,27,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#73004a]"
                 >
                   Apply for access
@@ -251,7 +252,7 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
               <h2 className="mt-3 font-heading text-3xl font-bold text-[#20313B]">
                 One platform, end to end
               </h2>
-              <p className="mt-3 text-base text-[#5a5a5a]">
+              <p className="mt-3 text-base text-[#5a5a5a]" style={{ color: '#5a5a5a' }}>
                 From building a cohort to downloading results, Virtual Lab brings
                 exploration, analysis, and computation together in one place.
               </p>
