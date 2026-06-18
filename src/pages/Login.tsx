@@ -220,14 +220,14 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: '#4d0231' }}
-                  className="inline-flex items-center justify-center rounded-md bg-[#FCA88D] px-8 py-3.5 text-base font-bold text-[#4d0231] no-underline shadow-[0_12px_30px_rgba(43,0,27,0.22)] transition-all hover:-translate-y-0.5 hover:bg-[#ffc0a8] hover:shadow-[0_16px_34px_rgba(43,0,27,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#73004a]"
+                  className="inline-flex items-center justify-center rounded-md bg-[#FCA88D] px-8 py-3.5 text-base font-bold text-[#4d0231] no-underline shadow-[0_20px_34px_rgba(43,0,27,0.42),0_8px_14px_rgba(43,0,27,0.26)] transition-all hover:-translate-y-0.5 hover:bg-[#ffc0a8] hover:shadow-[0_24px_42px_rgba(43,0,27,0.48),0_10px_18px_rgba(43,0,27,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#73004a]"
                 >
                   Apply for access
                 </a>
                 <button
                   type="button"
                   onClick={handleSignIn}
-                  className="inline-flex items-center justify-center rounded-md border border-white/55 bg-white/16 px-8 py-3.5 text-base font-bold text-white no-underline shadow-[0_12px_30px_rgba(43,0,27,0.18)] backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-white/75 hover:bg-white/24 hover:shadow-[0_16px_34px_rgba(43,0,27,0.24)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#73004a]"
+                  className="inline-flex items-center justify-center rounded-md border border-white/70 bg-white/18 px-8 py-3.5 text-base font-bold text-white no-underline shadow-[0_20px_34px_rgba(43,0,27,0.42),0_8px_14px_rgba(43,0,27,0.26),inset_0_1px_0_rgba(255,255,255,0.28),0_0_0_1px_rgba(255,255,255,0.08)] backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-white/90 hover:bg-white/26 hover:shadow-[0_24px_42px_rgba(43,0,27,0.48),0_10px_18px_rgba(43,0,27,0.3),inset_0_1px_0_rgba(255,255,255,0.36),0_0_24px_rgba(255,255,255,0.14)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#73004a]"
                 >
                   Sign in
                 </button>
