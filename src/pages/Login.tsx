@@ -280,14 +280,12 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
 
           <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-6 py-16 lg:grid-cols-2 lg:py-24">
             <div className="max-w-xl">
-              <div className="inline-flex max-w-full rounded-2xl bg-white px-6 py-4 shadow-2xl shadow-[#2b001b]/25 ring-1 ring-white/40 sm:px-8 sm:py-5">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={iconSrc('/images/logos/VirtualLab-R.svg')}
-                  alt="MMRF Virtual Lab"
-                  className="h-auto w-64 max-w-full sm:w-80"
-                />
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={iconSrc('/images/logos/VirtualLab-R-white.svg')}
+                alt="MMRF Virtual Lab"
+                className="h-auto w-80 max-w-full drop-shadow-[0_8px_22px_rgba(43,0,27,0.32)] sm:w-[26rem] lg:w-[30rem]"
+              />
               <h1 className="mt-8 font-heading text-4xl font-extrabold leading-[1.1] text-white sm:text-5xl">
                 Access, visualize, and analyze multiple myeloma data.
               </h1>
