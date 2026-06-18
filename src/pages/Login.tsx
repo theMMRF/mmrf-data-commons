@@ -100,7 +100,7 @@ const PreviewScreenTitle = () => (
     {PREVIEW_SCREENS.map((screen) => (
       <span
         key={screen.title}
-        className="vl-preview-label absolute left-0 top-0 inline-flex max-w-full truncate rounded-md bg-[#60023E] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white shadow-sm"
+        className="vl-preview-label absolute left-0 top-0 inline-flex max-w-full truncate rounded-md bg-[#8B0053] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white shadow-sm"
       >
         <span className="truncate">{screen.title}</span>
       </span>
@@ -109,15 +109,15 @@ const PreviewScreenTitle = () => (
 );
 
 const PlatformPreview = () => (
-  <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#f8f6f7]">
-    <div className="relative h-full w-full">
+  <div className="relative aspect-[16/10] w-full overflow-hidden bg-white p-2 sm:p-3">
+    <div className="relative h-full w-full overflow-hidden rounded-md bg-white">
       {PREVIEW_SCREENS.map((screen) => (
         <div key={screen.title} className="vl-preview-slide absolute inset-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={iconSrc(screen.image)}
             alt=""
-            className="h-full w-full object-cover object-left-top"
+            className="h-full w-full object-contain object-center"
           />
         </div>
       ))}
