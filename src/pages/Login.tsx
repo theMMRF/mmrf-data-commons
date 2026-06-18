@@ -93,6 +93,10 @@ const PREVIEW_SCREENS: ReadonlyArray<{
     title: 'ProteinPaint',
     image: '/images/ProteinPaint.png',
   },
+  {
+    title: 'Survival',
+    image: '/images/Survival.png',
+  },
 ];
 
 const PreviewScreenTitle = () => (
@@ -323,10 +327,10 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
           3% {
             opacity: 1;
           }
-          22% {
+          17% {
             opacity: 1;
           }
-          25% {
+          20% {
             opacity: 0;
           }
           100% {
@@ -336,7 +340,7 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
         .vl-preview-slide,
         .vl-preview-label {
           opacity: 0;
-          animation: vl-preview-fade 22s ease-in-out infinite;
+          animation: vl-preview-fade 25s ease-in-out infinite;
         }
         .vl-preview-slide:nth-child(1),
         .vl-preview-label:nth-child(1) {
@@ -344,15 +348,19 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
         }
         .vl-preview-slide:nth-child(2),
         .vl-preview-label:nth-child(2) {
-          animation-delay: -16.5s;
+          animation-delay: -20s;
         }
         .vl-preview-slide:nth-child(3),
         .vl-preview-label:nth-child(3) {
-          animation-delay: -11s;
+          animation-delay: -15s;
         }
         .vl-preview-slide:nth-child(4),
         .vl-preview-label:nth-child(4) {
-          animation-delay: -5.5s;
+          animation-delay: -10s;
+        }
+        .vl-preview-slide:nth-child(5),
+        .vl-preview-label:nth-child(5) {
+          animation-delay: -5s;
         }
         @media (prefers-reduced-motion: reduce) {
           .vl-preview-slide,
