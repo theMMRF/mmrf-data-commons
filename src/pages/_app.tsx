@@ -1,5 +1,6 @@
 import App, { AppContext, AppInitialProps, AppProps } from "next/app";
 import React, { Suspense, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
 import { MantineProvider } from "@mantine/core";
 import { mmrfModals } from "@/components/Modals/registerModals";
 import mantinetheme from "../mantineTheme";
@@ -74,7 +75,9 @@ const Gen3App = ({
   modalsConfig,
 }: AppProps & Gen3AppProps) => {
   const isFirstRender = useRef(true);
+  const router = useRouter();
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  const hideMainNavigation = router.pathname === "/Login";
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -125,7 +128,7 @@ const Gen3App = ({
               contextModals={mmrfModals}
             >
               <Gen3GDCCompatabilityProvider>
-                <MainNavigation />
+                {!hideMainNavigation && <MainNavigation />}
                 <Component {...pageProps} />
                 <GoogleAnalyticsLoader
                   enabled={cookieConsentState === 'accepted'}
