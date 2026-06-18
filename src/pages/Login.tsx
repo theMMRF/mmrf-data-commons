@@ -316,15 +316,19 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
 
       {/* eslint-disable-next-line react/no-unknown-property */}
       <style jsx global>{`
-        @keyframes vl-preview-cycle {
+        @keyframes vl-preview-fade {
           0% {
             opacity: 0;
           }
-          3%,
-          24% {
+          3% {
             opacity: 1;
           }
-          28%,
+          22% {
+            opacity: 1;
+          }
+          25% {
+            opacity: 0;
+          }
           100% {
             opacity: 0;
           }
@@ -332,10 +336,7 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
         .vl-preview-slide,
         .vl-preview-label {
           opacity: 0;
-          animation-duration: 24s;
-          animation-iteration-count: infinite;
-          animation-timing-function: ease-in-out;
-          animation-name: vl-preview-cycle;
+          animation: vl-preview-fade 22s ease-in-out infinite;
         }
         .vl-preview-slide:nth-child(1),
         .vl-preview-label:nth-child(1) {
@@ -343,15 +344,15 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
         }
         .vl-preview-slide:nth-child(2),
         .vl-preview-label:nth-child(2) {
-          animation-delay: 6s;
+          animation-delay: -16.5s;
         }
         .vl-preview-slide:nth-child(3),
         .vl-preview-label:nth-child(3) {
-          animation-delay: 12s;
+          animation-delay: -11s;
         }
         .vl-preview-slide:nth-child(4),
         .vl-preview-label:nth-child(4) {
-          animation-delay: 18s;
+          animation-delay: -5.5s;
         }
         @media (prefers-reduced-motion: reduce) {
           .vl-preview-slide,
