@@ -22,8 +22,12 @@ import { registerDiscoveryCustomCellRenderers } from "@/lib/Discovery/CustomCell
 import "../styles/globals.css";
 import "../styles/survivalplot.css";
 import "@fontsource/montserrat";
+import "@fontsource/montserrat/600.css";
+import "@fontsource/montserrat/700.css";
+import "@fontsource/montserrat/800.css";
 import "@fontsource/source-sans-pro";
 import "@fontsource/noto-sans";
+import "@fontsource/noto-sans/600.css";
 
 import { setDRSHostnames } from "@gen3/core";
 import drsHostnames from "../../config/drsHostnames.json";
