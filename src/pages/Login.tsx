@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
+import { showNotification } from '@mantine/notifications';
+import { GEN3_REDIRECT_URL, useGetLoginProvidersQuery } from '@gen3/core';
 import {
-  LoginPanel,
-  LoginConfig,
   LoginPageGetServerSideProps as getServerSideProps,
 } from '@gen3/frontend';
 import PageTitle from '@/components/PageTitle';
 
 const ACCESS_REQUEST_URL =
   'https://mmrf.formstack.com/forms/mmrf_virtual_lab_access_request';
-const VIRTUAL_LAB_INFO_URL =
-  'https://themmrf.org/for-researchers/data-access-via-virtual-lab/';
 const PLATFORM_PREVIEW_GIF_SRC = '/images/virtual-lab-preview.gif';
 
 const virtualLabFeatures = [
@@ -38,6 +37,75 @@ const virtualLabFeatures = [
     icon: '/icons/Data Download.svg',
   },
 ];
+
+const getUrlSeparator = (url: string) => (url.includes('?') ? '&' : '?');
+
+const appendParameterToUrl = (
+  url: string,
+  paramName: string,
+  paramValue: string,
+) => {
+  const [baseUrl, hash] = url.split('#');
+  const hashFragment = hash ? `#${hash}` : '';
+  const separator = getUrlSeparator(baseUrl);
+
+  return `${baseUrl}${separator}${encodeURIComponent(
+    paramName,
+  )}=${encodeURIComponent(paramValue)}${hashFragment}`;
+};
+
+const filterRedirect = (redirect?: string | string[]) => {
+  let redirectPath = Array.isArray(redirect) ? redirect[0] : redirect ?? '/';
+
+  if (redirectPath.includes('Login')) redirectPath = '/';
+
+  if (!GEN3_REDIRECT_URL) return redirectPath;
+
+  const baseUrl = GEN3_REDIRECT_URL.replace(/\/+$/, '');
+  const cleanPath = redirectPath.replace(/^\/+/, '');
+
+  return cleanPath ? `${baseUrl}/${cleanPath}` : baseUrl;
+};
+
+const HeroLoginButton = () => {
+  const router = useRouter();
+  const {
+    query: { referer: refererQuery, redirect: redirectQuery },
+  } = router;
+  const { data, isLoading, isFetching, isError } = useGetLoginProvidersQuery();
+  const loginUrl = data?.default_provider.urls[0]?.url;
+  const isDisabled = isLoading || isFetching || isError || !loginUrl;
+
+  const handleLogin = () => {
+    if (!loginUrl) return;
+
+    router
+      .push(
+        appendParameterToUrl(
+          loginUrl,
+          'redirect',
+          filterRedirect(redirectQuery || refererQuery),
+        ),
+      )
+      .catch((error: Error) => {
+        showNotification({
+          title: 'Login Error',
+          message: `error logging in ${error.message}`,
+        });
+      });
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleLogin}
+      disabled={isDisabled}
+      className="inline-flex items-center justify-center rounded-full border-2 border-mmrf-plum px-7 py-3 text-sm font-bold text-mmrf-plum transition hover:bg-mmrf-platinum disabled:cursor-not-allowed disabled:border-mmrf-lightgray disabled:text-mmrf-lightgray"
+    >
+      {isLoading || isFetching ? 'Loading...' : 'Log In'}
+    </button>
+  );
+};
 
 const PlatformPreview = () => {
   const [previewFailed, setPreviewFailed] = useState(false);
@@ -106,12 +174,7 @@ const PlatformPreview = () => {
   );
 };
 
-export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
-  const loginPanelConfig: LoginConfig = {
-    ...loginConfig,
-    topContent: [],
-  };
-
+export const LoginPage = () => {
   return (
     <>
       <PageTitle pageName="Login Page" />
@@ -143,14 +206,7 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
               >
                 Apply for Access
               </a>
-              <a
-                href={VIRTUAL_LAB_INFO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-full border-2 border-mmrf-plum px-7 py-3 text-sm font-bold text-mmrf-plum transition hover:bg-mmrf-platinum"
-              >
-                Learn More
-              </a>
+              <HeroLoginButton />
             </div>
           </div>
 
@@ -188,16 +244,17 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
         </section>
 
         <section className="mx-auto max-w-[960px] px-6 pb-16">
-          <div className="rounded-[2rem] bg-white p-6 shadow-xl shadow-mmrf-gunmetal/10 ring-1 ring-mmrf-gunmetal/10 md:p-8">
-            <div className="mb-6 text-center">
-              <p className="text-sm font-bold uppercase tracking-[0.25em] text-mmrf-plum">
-                Sign In
-              </p>
-              <h2 className="mt-2 text-3xl font-black text-mmrf-gunmetal">
-                Continue to MMRF Virtual Lab
-              </h2>
-            </div>
-            <LoginPanel {...loginPanelConfig} />
+          <div className="rounded-[2rem] bg-white/85 px-6 py-5 text-center shadow-lg shadow-mmrf-gunmetal/5 ring-1 ring-mmrf-gunmetal/10 backdrop-blur md:px-10">
+            <p className="text-sm leading-6 text-mmrf-gunmetal/80">
+              Questions about access or registration? Contact{' '}
+              <a
+                href="mailto:VirtualLab@themmrf.org"
+                className="font-bold text-mmrf-plum underline decoration-mmrf-plum/30 underline-offset-4 hover:text-mmrf-purple"
+              >
+                VirtualLab@themmrf.org
+              </a>
+              .
+            </p>
           </div>
         </section>
       </div>
