@@ -73,168 +73,79 @@ const FEATURES: ReadonlyArray<{
 
 const iconSrc = (path: string) => withClientBasePath(encodeURI(path));
 
-/**
- * Placeholder preview of the platform shown in the hero. The marketing team's
- * animated GIF can drop straight into the browser frame below: replace
- * <PlatformPreview /> with
- *   <img src={iconSrc('/images/virtual-lab-preview.gif')} alt="Virtual Lab in use" />
- * and keep the surrounding <BrowserFrame>.
- */
-const SurvivalScreen = () => (
-  <svg
-    viewBox="0 0 360 210"
-    className="h-full w-full"
-    role="img"
-    aria-label="Sample survival plot"
-  >
-    {/* axes */}
-    <line x1="44" y1="18" x2="44" y2="172" stroke="#cdccca" strokeWidth="1.5" />
-    <line x1="44" y1="172" x2="338" y2="172" stroke="#cdccca" strokeWidth="1.5" />
-    {[0, 1, 2, 3].map((g) => (
-      <line
-        key={g}
-        x1="44"
-        x2="338"
-        y1={172 - g * 46}
-        y2={172 - g * 46}
-        stroke="#efedea"
-        strokeWidth="1"
-      />
-    ))}
-    {/* two stepped survival curves */}
-    <polyline
-      className="vl-draw"
-      points="44,28 96,28 96,44 150,44 150,70 206,70 206,104 262,104 262,128 338,128"
-      fill="none"
-      stroke="#8b0053"
-      strokeWidth="3"
-      strokeLinejoin="round"
-      strokeLinecap="round"
-    />
-    <polyline
-      className="vl-draw vl-draw-2"
-      points="44,28 112,28 112,58 168,58 168,92 224,92 224,134 286,134 286,158 338,158"
-      fill="none"
-      stroke="#FCA88D"
-      strokeWidth="3"
-      strokeLinejoin="round"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
-const MUTATIONS: ReadonlyArray<[string, number]> = [
-  ['KRAS', 92],
-  ['NRAS', 78],
-  ['TP53', 54],
-  ['DIS3', 41],
-  ['FAM46C', 33],
-  ['BRAF', 21],
+const PREVIEW_SCREENS: ReadonlyArray<{
+  title: string;
+  image: string;
+}> = [
+  {
+    title: 'Gene Expression Clustering',
+    image: '/images/Gene Expression Clustering.png',
+  },
+  {
+    title: 'Genome Browser',
+    image: '/images/Genome Browser.png',
+  },
+  {
+    title: 'OncoMatrix',
+    image: '/images/OncoMatrix.png',
+  },
+  {
+    title: 'ProteinPaint',
+    image: '/images/ProteinPaint.png',
+  },
 ];
 
-const MutationScreen = () => (
-  <svg
-    viewBox="0 0 360 210"
-    className="h-full w-full"
-    role="img"
-    aria-label="Sample mutation frequency chart"
-  >
-    {MUTATIONS.map(([gene, width], i) => {
-      const y = 16 + i * 31;
-      return (
-        <g key={gene}>
-          <text
-            x="62"
-            y={y + 14}
-            textAnchor="end"
-            fontSize="12"
-            fontFamily="Montserrat, sans-serif"
-            fontStyle="italic"
-            fill="#20313B"
-          >
-            {gene}
-          </text>
-          <rect x="72" y={y} width="266" height="20" rx="4" fill="#f1eef0" />
-          <rect
-            className="vl-bar"
-            x="72"
-            y={y}
-            width={(width / 100) * 266}
-            height="20"
-            rx="4"
-            fill={i % 2 === 0 ? '#8b0053' : '#60023E'}
-          />
-        </g>
-      );
-    })}
-  </svg>
+const PreviewScreenTitle = () => (
+  <div className="relative h-6 min-w-0 flex-1">
+    {PREVIEW_SCREENS.map((screen) => (
+      <span
+        key={screen.title}
+        className="vl-preview-label absolute left-0 top-0 inline-flex max-w-full truncate rounded-md bg-[#60023E] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white shadow-sm"
+      >
+        <span className="truncate">{screen.title}</span>
+      </span>
+    ))}
+  </div>
 );
 
 const PlatformPreview = () => (
-  <div className="relative aspect-[16/10] w-full overflow-hidden bg-white">
-    {/* faux app sidebar + main, cross-fading between two analysis views */}
-    <div className="flex h-full w-full">
-      <aside
-        aria-hidden="true"
-        className="hidden w-[34%] flex-col gap-3 border-r border-[#efedea] bg-[#faf8f7] p-4 sm:flex"
-      >
-        <div className="text-[10px] font-semibold uppercase tracking-wider text-[#8b0053]">
-          Cohort
+  <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#f8f6f7]">
+    <div className="relative h-full w-full">
+      {PREVIEW_SCREENS.map((screen) => (
+        <div key={screen.title} className="vl-preview-slide absolute inset-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={iconSrc(screen.image)}
+            alt=""
+            className="h-full w-full object-cover object-left-top"
+          />
         </div>
-        {['Disease stage', 'Treatment', 'Age at diagnosis', 'Cytogenetics'].map(
-          (f, i) => (
-            <div key={f} className="space-y-1.5">
-              <div className="text-[10px] font-medium text-[#20313B]">{f}</div>
-              <div className="h-2 rounded-full bg-[#efedea]">
-                <div
-                  className="h-2 rounded-full bg-[#F58EB3]"
-                  style={{ width: `${[70, 45, 60, 35][i]}%` }}
-                />
-              </div>
-            </div>
-          ),
-        )}
-        <div className="mt-auto rounded-md bg-[#8b0053] px-3 py-2 text-center text-[10px] font-semibold text-white">
-          1,143 cases
-        </div>
-      </aside>
-
-      <div className="relative flex-1 p-4">
-        <div className="mb-3 flex h-6 items-center">
-          <div className="relative">
-            <span className="vl-screen-label-a inline-block whitespace-nowrap rounded-full bg-[#FFE1CC] px-2.5 py-1 text-[10px] font-semibold text-[#60023E]">
-              Survival
-            </span>
-            <span className="vl-screen-label-b absolute left-0 top-0 inline-block whitespace-nowrap rounded-full bg-[#FFE1CC] px-2.5 py-1 text-[10px] font-semibold text-[#60023E]">
-              Mutation frequency
-            </span>
-          </div>
-        </div>
-        <div className="relative h-[calc(100%-2rem)] w-full">
-          <div className="vl-screen vl-screen-a absolute inset-0">
-            <SurvivalScreen />
-          </div>
-          <div className="vl-screen vl-screen-b absolute inset-0">
-            <MutationScreen />
-          </div>
-        </div>
-      </div>
+      ))}
     </div>
   </div>
 );
 
-const BrowserFrame = ({ children }: { children: React.ReactNode }) => (
+const BrowserFrame = ({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title?: React.ReactNode;
+}) => (
   <div
     className="overflow-hidden rounded-xl border border-white/15 bg-white shadow-2xl ring-1 ring-black/5"
     aria-hidden="true"
   >
-    <div className="flex items-center gap-1.5 border-b border-[#efedea] bg-[#f4f3f1] px-4 py-2.5">
-      <span className="h-2.5 w-2.5 rounded-full bg-[#e7726f]" />
-      <span className="h-2.5 w-2.5 rounded-full bg-[#f1c453]" />
-      <span className="h-2.5 w-2.5 rounded-full bg-[#9fd6a0]" />
-      <span className="ml-3 truncate rounded-md bg-white px-3 py-1 text-[10px] font-medium text-[#6b6b6b]">
+    <div className="flex items-center gap-2 border-b border-[#efedea] bg-[#f4f3f1] px-3 py-2.5 sm:gap-3 sm:px-4">
+      <div className="flex shrink-0 items-center gap-1.5">
+        <span className="h-2.5 w-2.5 rounded-full bg-[#e7726f]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#f1c453]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#9fd6a0]" />
+      </div>
+      <span className="hidden max-w-44 truncate rounded-md bg-white px-3 py-1 text-[10px] font-medium text-[#6b6b6b] shadow-inner sm:block">
         virtuallab.themmrf.org
       </span>
+      {title}
     </div>
     {children}
   </div>
@@ -317,10 +228,7 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
             </div>
 
             <div className="relative">
-              <BrowserFrame>
-                {/* Swap the line below for the marketing GIF when ready:
-                    <img src={iconSrc('/images/virtual-lab-preview.gif')}
-                         alt="Virtual Lab in use" className="w-full" /> */}
+              <BrowserFrame title={<PreviewScreenTitle />}>
                 <PlatformPreview />
               </BrowserFrame>
             </div>
@@ -406,85 +314,54 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
         </section>
       </main>
 
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <style jsx global>{`
-        @keyframes vl-cycle {
-          0%,
-          42% {
-            opacity: 1;
-          }
-          50%,
-          92% {
+        @keyframes vl-preview-cycle {
+          0% {
             opacity: 0;
           }
-          100% {
+          3%,
+          24% {
             opacity: 1;
           }
-        }
-        @keyframes vl-cycle-alt {
-          0%,
-          42% {
-            opacity: 0;
-          }
-          50%,
-          92% {
-            opacity: 1;
-          }
+          28%,
           100% {
             opacity: 0;
           }
         }
-        @keyframes vl-draw-in {
-          from {
-            stroke-dashoffset: 620;
-          }
-          to {
-            stroke-dashoffset: 0;
-          }
+        .vl-preview-slide,
+        .vl-preview-label {
+          opacity: 0;
+          animation-duration: 24s;
+          animation-iteration-count: infinite;
+          animation-timing-function: ease-in-out;
+          animation-name: vl-preview-cycle;
         }
-        @keyframes vl-bar-in {
-          from {
-            transform: scaleX(0);
-          }
-          to {
-            transform: scaleX(1);
-          }
+        .vl-preview-slide:nth-child(1),
+        .vl-preview-label:nth-child(1) {
+          animation-delay: 0s;
         }
-        .vl-screen-a,
-        .vl-screen-label-a {
-          animation: vl-cycle 11s ease-in-out infinite;
+        .vl-preview-slide:nth-child(2),
+        .vl-preview-label:nth-child(2) {
+          animation-delay: 6s;
         }
-        .vl-screen-b,
-        .vl-screen-label-b {
-          animation: vl-cycle-alt 11s ease-in-out infinite;
+        .vl-preview-slide:nth-child(3),
+        .vl-preview-label:nth-child(3) {
+          animation-delay: 12s;
         }
-        .vl-draw {
-          stroke-dasharray: 620;
-          animation: vl-draw-in 2.2s ease-out forwards;
-        }
-        .vl-draw-2 {
-          animation-delay: 0.3s;
-        }
-        .vl-bar {
-          transform-origin: left center;
-          animation: vl-bar-in 1.1s ease-out forwards;
+        .vl-preview-slide:nth-child(4),
+        .vl-preview-label:nth-child(4) {
+          animation-delay: 18s;
         }
         @media (prefers-reduced-motion: reduce) {
-          .vl-screen-a,
-          .vl-screen-label-a {
+          .vl-preview-slide,
+          .vl-preview-label {
             animation: none;
-            opacity: 1;
-          }
-          .vl-screen-b,
-          .vl-screen-label-b {
-            animation: none;
-            opacity: 0;
-          }
-          .vl-draw,
-          .vl-draw-2,
-          .vl-bar {
-            animation: none;
-            stroke-dashoffset: 0;
             transform: none;
+          }
+          .vl-preview-slide:first-child,
+          .vl-preview-label:first-child {
+            opacity: 1;
           }
         }
       `}</style>
