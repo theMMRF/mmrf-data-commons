@@ -74,151 +74,44 @@ const FEATURES: ReadonlyArray<{
 const iconSrc = (path: string) => withClientBasePath(encodeURI(path));
 
 /**
- * Placeholder preview of the platform shown in the hero. The marketing team's
- * animated GIF can drop straight into the browser frame below: replace
- * <PlatformPreview /> with
- *   <img src={iconSrc('/images/virtual-lab-preview.gif')} alt="Virtual Lab in use" />
- * and keep the surrounding <BrowserFrame>.
+ * Hero preview of the platform. Real product screenshots cross-fade inside the
+ * browser frame, each captioned with the tool that produced it. To add or swap
+ * a view, edit PREVIEW_SHOTS below (filenames live in /public/images) — the
+ * cross-fade timing adapts to the number of entries automatically.
  */
-const SurvivalScreen = () => (
-  <svg
-    viewBox="0 0 360 210"
-    className="h-full w-full"
-    role="img"
-    aria-label="Sample survival plot"
-  >
-    {/* axes */}
-    <line x1="44" y1="18" x2="44" y2="172" stroke="#cdccca" strokeWidth="1.5" />
-    <line x1="44" y1="172" x2="338" y2="172" stroke="#cdccca" strokeWidth="1.5" />
-    {[0, 1, 2, 3].map((g) => (
-      <line
-        key={g}
-        x1="44"
-        x2="338"
-        y1={172 - g * 46}
-        y2={172 - g * 46}
-        stroke="#efedea"
-        strokeWidth="1"
-      />
-    ))}
-    {/* two stepped survival curves */}
-    <polyline
-      className="vl-draw"
-      points="44,28 96,28 96,44 150,44 150,70 206,70 206,104 262,104 262,128 338,128"
-      fill="none"
-      stroke="#8b0053"
-      strokeWidth="3"
-      strokeLinejoin="round"
-      strokeLinecap="round"
-    />
-    <polyline
-      className="vl-draw vl-draw-2"
-      points="44,28 112,28 112,58 168,58 168,92 224,92 224,134 286,134 286,158 338,158"
-      fill="none"
-      stroke="#FCA88D"
-      strokeWidth="3"
-      strokeLinejoin="round"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
-const MUTATIONS: ReadonlyArray<[string, number]> = [
-  ['KRAS', 92],
-  ['NRAS', 78],
-  ['TP53', 54],
-  ['DIS3', 41],
-  ['FAM46C', 33],
-  ['BRAF', 21],
+const PREVIEW_SHOTS: ReadonlyArray<{ src: string; tool: string }> = [
+  { src: '/images/OncoMatrix.png', tool: 'OncoMatrix' },
+  { src: '/images/Genome Browser.png', tool: 'Genome Browser' },
+  { src: '/images/ProteinPaint.png', tool: 'ProteinPaint' },
+  {
+    src: '/images/Gene Expression Clustering.png',
+    tool: 'Gene Expression Clustering',
+  },
 ];
-
-const MutationScreen = () => (
-  <svg
-    viewBox="0 0 360 210"
-    className="h-full w-full"
-    role="img"
-    aria-label="Sample mutation frequency chart"
-  >
-    {MUTATIONS.map(([gene, width], i) => {
-      const y = 16 + i * 31;
-      return (
-        <g key={gene}>
-          <text
-            x="62"
-            y={y + 14}
-            textAnchor="end"
-            fontSize="12"
-            fontFamily="Montserrat, sans-serif"
-            fontStyle="italic"
-            fill="#20313B"
-          >
-            {gene}
-          </text>
-          <rect x="72" y={y} width="266" height="20" rx="4" fill="#f1eef0" />
-          <rect
-            className="vl-bar"
-            x="72"
-            y={y}
-            width={(width / 100) * 266}
-            height="20"
-            rx="4"
-            fill={i % 2 === 0 ? '#8b0053' : '#60023E'}
-          />
-        </g>
-      );
-    })}
-  </svg>
-);
 
 const PlatformPreview = () => (
   <div className="relative aspect-[16/10] w-full overflow-hidden bg-white">
-    {/* faux app sidebar + main, cross-fading between two analysis views */}
-    <div className="flex h-full w-full">
-      <aside
-        aria-hidden="true"
-        className="hidden w-[34%] flex-col gap-3 border-r border-[#efedea] bg-[#faf8f7] p-4 sm:flex"
-      >
-        <div className="text-[10px] font-semibold uppercase tracking-wider text-[#8b0053]">
-          Cohort
-        </div>
-        {['Disease stage', 'Treatment', 'Age at diagnosis', 'Cytogenetics'].map(
-          (f, i) => (
-            <div key={f} className="space-y-1.5">
-              <div className="text-[10px] font-medium text-[#20313B]">{f}</div>
-              <div className="h-2 rounded-full bg-[#efedea]">
-                <div
-                  className="h-2 rounded-full bg-[#F58EB3]"
-                  style={{ width: `${[70, 45, 60, 35][i]}%` }}
-                />
-              </div>
-            </div>
-          ),
-        )}
-        <div className="mt-auto rounded-md bg-[#8b0053] px-3 py-2 text-center text-[10px] font-semibold text-white">
-          1,143 cases
-        </div>
-      </aside>
+    {/* Cross-fading screenshots */}
+    {PREVIEW_SHOTS.map((shot, i) => (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        key={shot.tool}
+        src={iconSrc(shot.src)}
+        alt={`${shot.tool} in the MMRF Virtual Lab`}
+        className={`vl-shot vl-shot-${i} absolute inset-0 h-full w-full object-contain p-3 pt-9`}
+      />
+    ))}
 
-      <div className="relative flex-1 p-4">
-        <div className="mb-3 flex h-6 items-center">
-          <div className="relative">
-            <span className="vl-screen-label-a inline-block whitespace-nowrap rounded-full bg-[#FFE1CC] px-2.5 py-1 text-[10px] font-semibold text-[#60023E]">
-              Survival
-            </span>
-            <span className="vl-screen-label-b absolute left-0 top-0 inline-block whitespace-nowrap rounded-full bg-[#FFE1CC] px-2.5 py-1 text-[10px] font-semibold text-[#60023E]">
-              Mutation frequency
-            </span>
-          </div>
-        </div>
-        <div className="relative h-[calc(100%-2rem)] w-full">
-          <div className="vl-screen vl-screen-a absolute inset-0">
-            <SurvivalScreen />
-          </div>
-          <div className="vl-screen vl-screen-b absolute inset-0">
-            <MutationScreen />
-          </div>
-        </div>
-      </div>
+    {/* Caption pill naming the tool on screen */}
+    <div className="pointer-events-none absolute left-3 top-3 h-6">
+      {PREVIEW_SHOTS.map((shot, i) => (
+        <span
+          key={shot.tool}
+          className={`vl-shot vl-shot-${i} absolute left-0 top-0 inline-block whitespace-nowrap rounded-full bg-[#FFE1CC] px-2.5 py-1 text-[10px] font-semibold text-[#60023E] shadow-sm`}
+        >
+          {shot.tool}
+        </span>
+      ))}
     </div>
   </div>
 );
@@ -318,9 +211,6 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
 
             <div className="relative">
               <BrowserFrame>
-                {/* Swap the line below for the marketing GIF when ready:
-                    <img src={iconSrc('/images/virtual-lab-preview.gif')}
-                         alt="Virtual Lab in use" className="w-full" /> */}
                 <PlatformPreview />
               </BrowserFrame>
             </div>
@@ -407,84 +297,48 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
       </main>
 
       <style jsx global>{`
-        @keyframes vl-cycle {
-          0%,
-          42% {
+        /* Four screenshots share one 22s loop; each holds for a quarter of the
+           cycle and is offset by a negative delay so they advance in sequence. */
+        @keyframes vl-shot-fade {
+          0% {
+            opacity: 0;
+          }
+          3% {
             opacity: 1;
           }
-          50%,
-          92% {
+          22% {
+            opacity: 1;
+          }
+          25% {
             opacity: 0;
           }
           100% {
-            opacity: 1;
-          }
-        }
-        @keyframes vl-cycle-alt {
-          0%,
-          42% {
-            opacity: 0;
-          }
-          50%,
-          92% {
-            opacity: 1;
-          }
-          100% {
             opacity: 0;
           }
         }
-        @keyframes vl-draw-in {
-          from {
-            stroke-dashoffset: 620;
-          }
-          to {
-            stroke-dashoffset: 0;
-          }
+        .vl-shot {
+          opacity: 0;
+          animation: vl-shot-fade 22s ease-in-out infinite;
         }
-        @keyframes vl-bar-in {
-          from {
-            transform: scaleX(0);
-          }
-          to {
-            transform: scaleX(1);
-          }
+        .vl-shot-0 {
+          animation-delay: 0s;
         }
-        .vl-screen-a,
-        .vl-screen-label-a {
-          animation: vl-cycle 11s ease-in-out infinite;
+        .vl-shot-1 {
+          animation-delay: -16.5s;
         }
-        .vl-screen-b,
-        .vl-screen-label-b {
-          animation: vl-cycle-alt 11s ease-in-out infinite;
+        .vl-shot-2 {
+          animation-delay: -11s;
         }
-        .vl-draw {
-          stroke-dasharray: 620;
-          animation: vl-draw-in 2.2s ease-out forwards;
-        }
-        .vl-draw-2 {
-          animation-delay: 0.3s;
-        }
-        .vl-bar {
-          transform-origin: left center;
-          animation: vl-bar-in 1.1s ease-out forwards;
+        .vl-shot-3 {
+          animation-delay: -5.5s;
         }
         @media (prefers-reduced-motion: reduce) {
-          .vl-screen-a,
-          .vl-screen-label-a {
-            animation: none;
-            opacity: 1;
-          }
-          .vl-screen-b,
-          .vl-screen-label-b {
+          .vl-shot {
             animation: none;
             opacity: 0;
           }
-          .vl-draw,
-          .vl-draw-2,
-          .vl-bar {
-            animation: none;
-            stroke-dashoffset: 0;
-            transform: none;
+          .vl-shot-0 {
+            opacity: 1;
           }
         }
       `}</style>
