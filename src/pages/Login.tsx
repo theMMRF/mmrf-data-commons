@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useRouter } from 'next/router';
+import localFont from 'next/font/local';
 import {
   LoginPanel,
   LoginConfig,
@@ -12,6 +13,48 @@ import { withClientBasePath } from '@/lib/basePath';
 const APPLY_URL =
   'https://mmrf.formstack.com/forms/mmrf_virtual_lab_access_request';
 const CONTACT_EMAIL = 'VirtualLab@themmrf.org';
+
+const landingHeadingFont = localFont({
+  src: [
+    {
+      path: '../../node_modules/@fontsource/montserrat/files/montserrat-latin-400-normal.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../node_modules/@fontsource/montserrat/files/montserrat-latin-600-normal.woff2',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: '../../node_modules/@fontsource/montserrat/files/montserrat-latin-700-normal.woff2',
+      weight: '700',
+      style: 'normal',
+    },
+    {
+      path: '../../node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2',
+      weight: '800',
+      style: 'normal',
+    },
+  ],
+  display: 'swap',
+});
+
+const landingContentFont = localFont({
+  src: [
+    {
+      path: '../../node_modules/@fontsource/noto-sans/files/noto-sans-latin-400-normal.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../node_modules/@fontsource/noto-sans/files/noto-sans-latin-600-normal.woff2',
+      weight: '600',
+      style: 'normal',
+    },
+  ],
+  display: 'swap',
+});
 
 interface LoginProvidersData {
   default_provider?: { name?: string; urls?: { url: string; name: string }[] };
@@ -175,7 +218,7 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
     <>
       <PageTitle pageName="Login Page" />
 
-      <main className="font-content text-[#20313B]">
+      <main className={`${landingContentFont.className} text-[#20313B]`}>
         {/* ---------- Hero ---------- */}
         <section className="relative overflow-hidden bg-gradient-to-br from-[#4d0231] via-[#73004a] to-[#8b0053]">
           {/* subtle genomic motif */}
@@ -201,7 +244,9 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
                 alt="MMRF Virtual Lab"
                 className="h-auto w-80 max-w-full drop-shadow-[0_8px_22px_rgba(43,0,27,0.32)] sm:w-[26rem] lg:w-[30rem]"
               />
-              <h1 className="mt-8 font-heading text-4xl font-extrabold leading-[1.1] text-white sm:text-5xl">
+              <h1
+                className={`${landingHeadingFont.className} mt-8 text-4xl font-extrabold leading-[1.1] text-white sm:text-5xl`}
+              >
                 Access, visualize, and analyze multiple myeloma data.
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-white/85">
@@ -246,10 +291,14 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
         <section className="bg-white">
           <div className="mx-auto max-w-7xl px-6 py-16 lg:py-20">
             <div className="max-w-2xl">
-              <p className="font-heading text-sm font-semibold uppercase tracking-[0.2em] text-[#8b0053]">
+              <p
+                className={`${landingHeadingFont.className} text-sm font-semibold uppercase tracking-[0.2em] text-[#8b0053]`}
+              >
                 What you can do
               </p>
-              <h2 className="mt-3 font-heading text-3xl font-bold text-[#20313B]">
+              <h2
+                className={`${landingHeadingFont.className} mt-3 text-3xl font-bold text-[#20313B]`}
+              >
                 One platform, end to end
               </h2>
               <p className="mt-3 text-base text-[#5a5a5a]" style={{ color: '#5a5a5a' }}>
@@ -273,7 +322,9 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
                       className="h-7 w-7"
                     />
                   </div>
-                  <h3 className="mt-5 font-heading text-lg font-bold text-[#8b0053]">
+                  <h3
+                    className={`${landingHeadingFont.className} mt-5 text-lg font-bold text-[#8b0053]`}
+                  >
                     {feature.title}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-[#5a5a5a]">

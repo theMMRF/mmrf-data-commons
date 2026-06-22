@@ -12,6 +12,7 @@ import { fetchTermsAcceptedFromBff } from './lib/terms/middlewareTermsCheck';
 import { getSafeReferer } from './lib/terms/referer';
 
 const WILDCARD_ROUTE_KEY = '*';
+const ROOT_PATH = '/';
 
 function getRouteRuleForPath(pathname: string, routeConfig: RouteConfig) {
   return routeConfig?.[pathname] ?? routeConfig?.[WILDCARD_ROUTE_KEY];
@@ -21,12 +22,28 @@ function isLoggedIn(loginStatus: LoginStatus) {
   return loginStatus.status === 'issued';
 }
 
+function getPathWithSearch(req: NextRequest) {
+  return `${req.nextUrl.pathname}${req.nextUrl.search}`;
+}
+
+function redirectToLogin(req: NextRequest) {
+  const loginUrl = new URL('/Login', req.url);
+  loginUrl.searchParams.set('referer', getPathWithSearch(req));
+  return NextResponse.redirect(loginUrl);
+}
+
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
+  const cookieHeader = req.headers.get('Cookie') || '';
+  let loginStatus: LoginStatus | null = null;
+
+  const getRequestLoginStatus = async () => {
+    loginStatus ??= await getLoginStatus(cookieHeader);
+    return loginStatus;
+  };
 
   if (!isExemptFromTermsCheck(pathname)) {
-    const cookieHeader = req.headers.get('Cookie') || '';
-    const loginStatus = await getLoginStatus(cookieHeader);
+    const loginStatus = await getRequestLoginStatus();
 
     if (loginStatus.status === 'issued') {
       const termsGate = await fetchTermsAcceptedFromBff(req);
@@ -40,6 +57,13 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(termsUrl);
       }
     }
+  }
+
+  const currentLoginStatus = await getRequestLoginStatus();
+  const loggedIn = isLoggedIn(currentLoginStatus);
+
+  if (pathname === ROOT_PATH && !loggedIn) {
+    return redirectToLogin(req);
   }
 
   const { routes: routeConfig } = await getRouteConfig();
@@ -56,13 +80,8 @@ export async function middleware(req: NextRequest) {
   const loginRequired = rule.loginRequired ?? true;
   const needsAuthz = Array.isArray(rule?.authz) && rule?.authz.length > 0;
 
-  const loginStatus = await getLoginStatus(req.headers.get('Cookie') || '');
-  const loggedIn = await isLoggedIn(loginStatus);
-
   if (loginRequired && !loggedIn) {
-    const loginUrl = new URL('/Login', req.url);
-    loginUrl.searchParams.set('referer', pathname);
-    return NextResponse.redirect(loginUrl);
+    return redirectToLogin(req);
   }
 
   if (!needsAuthz) {
@@ -70,13 +89,10 @@ export async function middleware(req: NextRequest) {
   }
 
   if (!loggedIn) {
-    const loginUrl = new URL('/Login', req.url);
-    loginUrl.searchParams.set('referer', pathname);
-    return NextResponse.redirect(loginUrl);
+    return redirectToLogin(req);
   }
 
-  const tokenFromCookie =
-    getAccessToken(req.headers.get('Cookie') || '') ?? null;
+  const tokenFromCookie = getAccessToken(cookieHeader) ?? null;
 
   const resources = await fetchArboristResources(
     tokenFromCookie,
