@@ -220,16 +220,16 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: '#4d0231' }}
-                  className="inline-flex min-w-40 items-center justify-center rounded-md bg-[#FCA88D] px-9 py-4 text-lg font-bold text-[#4d0231] no-underline shadow-[0_20px_34px_rgba(43,0,27,0.42),0_8px_14px_rgba(43,0,27,0.26)] transition-all hover:-translate-y-0.5 hover:bg-[#ffc0a8] hover:shadow-[0_24px_42px_rgba(43,0,27,0.48),0_10px_18px_rgba(43,0,27,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#73004a]"
+                  className="inline-flex min-w-40 items-center justify-center rounded-md bg-[#D0D2F1] px-9 py-4 text-lg font-bold text-[#4d0231] no-underline shadow-[0_20px_34px_rgba(43,0,27,0.42),0_8px_14px_rgba(43,0,27,0.26)] transition-all hover:-translate-y-0.5 hover:bg-[#e1e3ff] hover:shadow-[0_24px_42px_rgba(43,0,27,0.48),0_10px_18px_rgba(43,0,27,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#73004a]"
                 >
-                  Apply for access
+                  Apply for Access
                 </a>
                 <button
                   type="button"
                   onClick={handleSignIn}
                   className="inline-flex min-w-32 items-center justify-center rounded-md border border-white/70 bg-white/18 px-9 py-4 text-lg font-bold text-white no-underline shadow-[0_20px_34px_rgba(43,0,27,0.42),0_8px_14px_rgba(43,0,27,0.26),inset_0_1px_0_rgba(255,255,255,0.28),0_0_0_1px_rgba(255,255,255,0.08)] backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-white/90 hover:bg-white/26 hover:shadow-[0_24px_42px_rgba(43,0,27,0.48),0_10px_18px_rgba(43,0,27,0.3),inset_0_1px_0_rgba(255,255,255,0.36),0_0_24px_rgba(255,255,255,0.14)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#73004a]"
                 >
-                  Sign in
+                  Sign In
                 </button>
               </div>
             </div>
@@ -264,7 +264,7 @@ export const LoginPage = ({ loginConfig }: { loginConfig: LoginConfig }) => {
                   key={feature.title}
                   className="group flex flex-col rounded-xl border border-[#e7e5e2] bg-white p-6 transition-all hover:-translate-y-1 hover:border-[#8b0053]/30 hover:shadow-lg"
                 >
-                  <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-[#FFE1CC]">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-[#D0D2F1]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={iconSrc(feature.icon)}
