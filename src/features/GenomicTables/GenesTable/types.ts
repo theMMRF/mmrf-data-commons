@@ -9,6 +9,7 @@ export interface GeneRowInfo {
   readonly cnv_count_amplification: number;
   readonly cnv_count_gain: number;
   readonly cnv_count_loss: number;
+  readonly cnv_count_neutral: number;
   readonly cnv_count_homozygous_deletion: number;
   readonly cnv_case: number;
   readonly cytoband: Array<string>;
@@ -40,6 +41,10 @@ export interface Gene {
     denominator: number;
   };
   '#_cnv_loss': {
+    numerator: number;
+    denominator: number;
+  };
+  '#_cnv_neutral': {
     numerator: number;
     denominator: number;
   };
