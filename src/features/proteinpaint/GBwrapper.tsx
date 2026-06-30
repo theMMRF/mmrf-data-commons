@@ -148,7 +148,7 @@ function getGBtrack(
     opts: {
       genomeBrowser: {
 				allow2selectSamples: {
-					buttonText: "Create Cohort",
+					buttonText: "Create cohort",
 					attributes: [{
 						from: "sample_id",
 						to: "cases.case_id",

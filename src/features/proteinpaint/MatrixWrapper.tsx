@@ -349,7 +349,7 @@ function getMatrixTrack(
       },
       [props.chartType]: {
         allow2selectSamples: {
-          buttonText: "Create Cohort",
+          buttonText: "Create cohort",
           attributes: [
             {
               from: "sample",
