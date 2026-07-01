@@ -14,6 +14,8 @@ import { isEqual, cloneDeep } from "lodash";
 import { DemoText } from "@/components/tailwindComponents";
 import { selectCurrentCohortCaseFilters } from "@/core/utils";
 import { COHORT_FILTER_INDEX, PROTEINPAINT_API } from '@/core';
+import { updateFilters } from './updateFilters';
+import { SelectSamples, SelectSamplesCallback } from "./sjpp-types";
 
 const basepath = PROTEINPAINT_API;
 
@@ -58,7 +60,7 @@ export const CorrelationWrapper: FC<PpProps> = (props: PpProps) => {
   useDeepCompareEffect(
     () => {
       const rootElem = divRef.current;
-      const data = getCorrelationTrack(props, filter0);
+      const data = getCorrelationTrack(props, updateFilters, filter0);
       if (!data) return;
       /*if (isDemoMode) {
         data.geneSymbol = props.hardcodeCnvOnly
@@ -129,12 +131,36 @@ interface Mds3Arg {
   host: string;
   filter0?: FilterSet;
   launchGdcCorrelation?: boolean;
+  opts: CorrelationArgOpts;
+}
+
+interface CorrelationArgOpts {
+  barchart: {
+    allow2selectSamples: SelectSamples
+  },
+  violin: {
+    allow2selectSamples: SelectSamples
+  },
+  boxplot: {
+    allow2selectSamples: SelectSamples
+  }
 }
 
 function getCorrelationTrack(
   props: PpProps,
+  callback: SelectSamplesCallback,
   filter0: any
 ) {
+  const allow2selectSamples = {
+    buttonText: "Create cohort",
+    attributes: [{
+      from: "sample",
+      to: "cases.case_id",
+      convert: true
+    }],
+    callback
+  }
+
   const arg: Mds3Arg = {
     dslabel: 'MMRF',
     genome: 'hg38',
@@ -143,6 +169,17 @@ function getCorrelationTrack(
     host: props.basepath || (basepath as string),
     launchGdcCorrelation: true,
     filter0,
+    opts: {
+      barchart: {
+				allow2selectSamples
+			},
+			violin: {
+				allow2selectSamples
+			},
+			boxplot: {
+				allow2selectSamples
+			}
+    }
   };
 
   return arg;
