@@ -199,6 +199,7 @@ export const GenesTableContainer: React.FC<GTableContainerProps> = ({
     type: false,
     '#_cnv_homozygous_deletions': false,
     '#_cnv_amplifications': false,
+    '#_cnv_neutral': false,
   });
 
   /*   const setFilters =

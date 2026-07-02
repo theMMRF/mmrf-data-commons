@@ -15,7 +15,13 @@ export interface GeneRowInfo {
   readonly case_cnv_amplification: number;
   readonly case_cnv_gain: number;
   readonly case_cnv_loss: number;
+  readonly case_cnv_neutral: number;
   readonly case_cnv_homozygous_deletion: number;
+  readonly cnv_count_amplification: number;
+  readonly cnv_count_gain: number;
+  readonly cnv_count_loss: number;
+  readonly cnv_count_neutral: number;
+  readonly cnv_count_homozygous_deletion: number;
   readonly cnv_case: number;
   readonly cytoband: Array<string>;
   readonly gene_id: string;

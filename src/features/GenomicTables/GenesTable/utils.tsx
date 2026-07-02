@@ -357,6 +357,30 @@ export const useGenerateGenesTableColumns = ({
         },
       }),
       genesTableColumnHelper.display({
+        id: '#_cnv_neutral',
+        header: () => (
+          <HeaderTooltip
+            title="# CNV Neutral"
+            tooltip={
+              '# Cases where CNV neutral calls are observed in Gene / # Cases tested for Copy Number Variations in Gene'
+            }
+          />
+        ),
+        cell: ({ row }: any) => {
+          const { numerator, denominator } = row.original['#_cnv_neutral'] ?? {
+            numerator: 0,
+            denominator: 1,
+          };
+          return (
+            <NumeratorDenominator
+              numerator={numerator}
+              denominator={denominator}
+              boldNumerator={true}
+            />
+          );
+        },
+      }),
+      genesTableColumnHelper.display({
         id: '#_mutations',
         header: () => (
           <HeaderTooltip
@@ -464,6 +488,10 @@ export const getGene = (
     },
     '#_cnv_loss': {
       numerator: g.cnv_count_loss,
+      denominator: cnvCases,
+    },
+    '#_cnv_neutral': {
+      numerator: g.cnv_count_neutral,
       denominator: cnvCases,
     },
     '#_cnv_homozygous_deletions': {
