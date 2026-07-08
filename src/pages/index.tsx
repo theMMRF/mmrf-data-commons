@@ -31,8 +31,6 @@ import { formatGeneSymbol } from '@/utils/formatQueryExpressionValues';
 const PROD_HOSTNAME = 'virtuallab.themmrf.org';
 const PROD_HIDDEN_APP_IDS = new Set([
   'DE',
-  'SC',
-  'Correlation',
 ]);
 
 interface CountsPanelProps {
