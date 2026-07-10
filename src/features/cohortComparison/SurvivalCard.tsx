@@ -13,7 +13,7 @@ import { SurvivalPlotTypes } from "../charts/SurvivalPlot/types";
 import { useDeepCompareEffect } from "use-deep-compare";
 import { EmptySurvivalPlot } from "@/core/features/survival/types";
 import { useGetComparisonSurvivalPlotQuery } from '@/core/features/survival/survivalApiSlice';
-import { CASE_CENTRIC_INDEX, COHORT_FILTER_INDEX } from '@/core';
+import { CASE_CENTRIC_INDEX } from '@/core';
 
 const survivalDataCompletenessFilters: GqlOperation[] = [
   {
@@ -100,7 +100,7 @@ const SurvivalCard: React.FC<SurvivalCardProps> = ({
   const { data, isUninitialized, isFetching, isError } =
     useGetComparisonSurvivalPlotQuery({
       filters: [filters.cohort1, filters.cohort2],
-      index: CASE_CENTRIC_INDEX,
+      doc_type: CASE_CENTRIC_INDEX,
       field: 'case_id',
     });
 

@@ -25,7 +25,7 @@ interface SurvivalPlotRequest {
 
 interface SurvivalPlotCompareRequest {
   filters: ReadonlyArray<GQLFilter>;
-  index: string;
+  doc_type: string;
   field: string;
   mode?: string;
 }
