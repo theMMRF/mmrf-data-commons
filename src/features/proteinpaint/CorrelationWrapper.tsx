@@ -1,6 +1,7 @@
 import React, { useRef, useState, FC } from "react";
 import { useDeepCompareEffect } from "use-deep-compare";
-import { bindProteinPaint } from "@sjcrh/proteinpaint-client";
+//import { bindProteinPaint } from "@sjcrh/proteinpaint-client";
+import { bindProteinPaint } from './runpp.ts'
 import { useIsDemoApp } from "@/hooks/useIsDemoApp";
 import {
   useCoreSelector,
@@ -18,6 +19,7 @@ import { updateFilters } from './updateFilters';
 import { SelectSamples, SelectSamplesCallback } from "./sjpp-types";
 
 const basepath = PROTEINPAINT_API;
+//const { bindProteinPaint } = await getRunPp()
 
 interface PpProps {
   basepath?: string;
@@ -57,6 +59,8 @@ export const CorrelationWrapper: FC<PpProps> = (props: PpProps) => {
   //   }
   // }, [response.isSuccess, coreDispatch, response.data]);
 
+
+
   useDeepCompareEffect(
     () => {
       const rootElem = divRef.current;
@@ -85,16 +89,20 @@ export const CorrelationWrapper: FC<PpProps> = (props: PpProps) => {
       // so no need to include debouncing and promise code in this wrapper
       // TODO: will revert to using runproteinpaint() once these advanced capabilities
       // are merged into it
-      bindProteinPaint({
-        rootElem,
-        initArgs: arg,
-        updateArgs: arg,
-        isStale() {
-          // new data has replaced this one, will prevent unnecessary render
-          // in case of race condition
-          return prevArg.current != data;
-        },
-      });
+      // getRunPp().then(({bindProteinPaint}) => {
+      // 	console.log(61, bindProteinPaint)
+
+	      bindProteinPaint({
+	        rootElem,
+	        initArgs: arg,
+	        updateArgs: arg,
+	        isStale() {
+	          // new data has replaced this one, will prevent unnecessary render
+	          // in case of race condition
+	          return prevArg.current != data;
+	        },
+	      });
+	    //})
     },
 
     [ isDemoMode, filter0, userDetails.currentData ],
