@@ -361,19 +361,19 @@
           "description": "Final Clinical Genomic Scoring (CGS) risk classification."
         },
         "cgs_risk_key_criteria.criteria_1": {
-          "label": "CGS Criterion 1",
+          "label": "CGS Criterion 1 (del(17p) >20% and/or TP53 mutation)",
           "description": "Meets CGS Criterion 1: del(17p), with a cutoff of greater than 20% clonal fraction, and/or a TP53 mutation."
         },
         "cgs_risk_key_criteria.criteria_2": {
-          "label": "CGS Criterion 2",
+          "label": "CGS Criterion 2 (high-risk translocation + 1q gain or del(1p32))",
           "description": "Meets CGS Criterion 2: t(4;14), t(14;16), or t(14;20), plus 1q gain/amplification or del(1p32)."
         },
         "cgs_risk_key_criteria.criteria_3": {
-          "label": "CGS Criterion 3",
+          "label": "CGS Criterion 3 (del(1p32) with 1q gain, or biallelic del(1p32))",
           "description": "Meets CGS Criterion 3: monoallelic del(1p32) with 1q gain/amplification, or biallelic del(1p32)."
         },
         "cgs_risk_key_criteria.criteria_4": {
-          "label": "CGS Criterion 4",
+          "label": "CGS Criterion 4 (β2-microglobulin ≥5.5 mg/L, normal creatinine)",
           "description": "Meets CGS Criterion 4: beta-2 microglobulin at or above 5.5 mg/L with normal creatinine below 1.2 mg/dL."
         },
         "cgs_risk_key_criteria.has_del17p13": {
