@@ -363,77 +363,92 @@
         "cgs_risk_key_criteria.criteria_1": {
           "label": "CGS Criterion 1 (del(17p) >20% and/or TP53 mutation)",
           "description": "Meets CGS Criterion 1: del(17p), with a cutoff of greater than 20% clonal fraction, and/or a TP53 mutation.",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.criteria_2": {
           "label": "CGS Criterion 2 (high-risk translocation + 1q gain or del(1p32))",
           "description": "Meets CGS Criterion 2: t(4;14), t(14;16), or t(14;20), plus 1q gain/amplification or del(1p32).",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.criteria_3": {
           "label": "CGS Criterion 3 (del(1p32) with 1q gain, or biallelic del(1p32))",
           "description": "Meets CGS Criterion 3: monoallelic del(1p32) with 1q gain/amplification, or biallelic del(1p32).",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.criteria_4": {
           "label": "CGS Criterion 4 (β2-microglobulin ≥5.5 mg/L, normal creatinine)",
           "description": "Meets CGS Criterion 4: beta-2 microglobulin at or above 5.5 mg/L with normal creatinine below 1.2 mg/dL.",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.has_del17p13": {
           "label": "del(17p13)",
           "description": "Presence of a deletion at chromosome region 17p13.",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.has_tp53_mutation": {
           "label": "TP53 Mutation",
           "description": "Presence of a TP53 mutation.",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.has_t414": {
           "label": "t(4;14)",
           "description": "Presence of a t(4;14) translocation.",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.has_t1416": {
           "label": "t(14;16)",
           "description": "Presence of a t(14;16) translocation.",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.has_t1420": {
           "label": "t(14;20)",
           "description": "Presence of a t(14;20) translocation.",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.has_1q": {
           "label": "1q Gain/Amplification",
           "description": "Presence of a gain or amplification of chromosome arm 1q.",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.has_mono_del1p32": {
           "label": "Monoallelic del(1p32)",
           "description": "Presence of a monoallelic deletion at chromosome region 1p32.",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.has_bi_del1p32": {
           "label": "Biallelic del(1p32)",
           "description": "Presence of a biallelic deletion at chromosome region 1p32.",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.has_del1p32": {
           "label": "Any del(1p32)",
           "description": "Presence of any deletion at chromosome region 1p32.",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.has_high_b2m": {
           "label": "Elevated Beta-2 Microglobulin (>5.5 mg/L)",
           "description": "Beta-2 microglobulin is above 5.5 mg/L.",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         },
         "cgs_risk_key_criteria.has_normal_creatinine": {
           "label": "Normal Creatinine (<1.2 mg/dL)",
           "description": "Creatinine is below 1.2 mg/dL.",
-          "defaultSort": "label-asc"
+          "defaultSort": "label-desc",
+          "excludeValues": ["na"]
         }
       },
       "queryOptions": {
