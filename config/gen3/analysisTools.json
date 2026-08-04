@@ -132,6 +132,17 @@
           "countUnits": "Cases"
         },
         {
+          "title": "Differential Gene Expression",
+          "type": "application",
+          "hasDemo": false,
+          "loginRequired": false,
+          "description": "Identify differentially expressed genes between groups.",
+          "icon": "/icons/apps/DE.png",
+          "appId": "DE",
+          "hideCounts": true,
+          "countUnits": "Cases"
+        },
+        {
           "title": "Single Cell RNA-seq",
           "type": "application",
           "hasDemo": false,
