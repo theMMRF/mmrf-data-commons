@@ -29,9 +29,7 @@ import { useProjectId } from '@/hooks/useAppFilters';
 import { formatGeneSymbol } from '@/utils/formatQueryExpressionValues';
 
 const PROD_HOSTNAME = 'virtuallab.themmrf.org';
-const PROD_HIDDEN_APP_IDS = new Set([
-  'DE',
-]);
+const PROD_HIDDEN_APP_IDS = new Set<string>();
 
 interface CountsPanelProps {
   index: string;
