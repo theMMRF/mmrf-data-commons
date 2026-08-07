@@ -335,6 +335,36 @@
         "indexPrefix": "CaseCentric_"
       }
     },
+    "cgs_risk": {
+      "label": "CGS Risk",
+      "facets": [
+        "cgs_risk_key_criteria.cgs_risk_category",
+        "cgs_risk_key_criteria.cgs_risk_criteria",
+        "cgs_risk_key_criteria.other_criteria"
+      ],
+      "fieldsConfig": {
+        "cgs_risk_key_criteria.cgs_risk_category": {
+          "label": "CGS Risk Category",
+          "description": "Final Clinical Genomic Scoring (CGS) risk classification."
+        },
+        "cgs_risk_key_criteria.cgs_risk_criteria": {
+          "label": "CGS Risk Criteria",
+          "description": "The Clinical Genomic Scoring (CGS) risk criteria met by the case. Only criteria with a positive result are included; negative and unavailable criterion results are omitted.",
+          "defaultSort": "label-asc",
+          "showMatchModeSelector": true
+        },
+        "cgs_risk_key_criteria.other_criteria": {
+          "label": "Other Criteria",
+          "description": "Known positive and negative results for genomic and laboratory criteria used to derive Clinical Genomic Scoring (CGS) risk. Unavailable results are omitted.",
+          "defaultSort": "label-asc",
+          "showMatchModeSelector": true
+        }
+      },
+      "queryOptions": {
+        "index": "case_centric",
+        "indexPrefix": "CaseCentric_"
+      }
+    },
     "biospecimen": {
       "label": "Biospecimen",
       "facets": [
