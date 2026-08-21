@@ -10,6 +10,7 @@ WORKDIR /gen3
 
 # Copy dependency files first for better caching
 COPY package.json package-lock.json ./
+COPY vendor/gen3-preview ./vendor/gen3-preview
 
 # Install ALL dependencies once (including dev deps for build)
 RUN npm config set fetch-retries 5 && \
