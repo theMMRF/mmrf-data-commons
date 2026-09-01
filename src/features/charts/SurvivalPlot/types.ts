@@ -1,6 +1,6 @@
 import { JSX } from "react";
 import { SurvivalPlotData } from '@/core/features/survival';
-import { Dispatch, MutableRefObject, SetStateAction } from "react";
+import { Dispatch, RefCallback, SetStateAction } from "react";
 import { entityMetadataType } from '@/utils/contexts';
 
 export enum SurvivalPlotTypes {
@@ -19,7 +19,7 @@ export type UseSurvivalType = (
   height: number,
   setTooltip?: (x?: any) => any,
   setEntityMetadata?: Dispatch<SetStateAction<entityMetadataType>>,
-) => MutableRefObject<any>;
+) => RefCallback<HTMLDivElement>;
 
 export interface SurvivalPlotProps {
   readonly data: SurvivalPlotData;

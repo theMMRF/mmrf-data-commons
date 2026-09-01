@@ -7,7 +7,7 @@ import CookieConsentBanner, {
   COOKIE_CONSENT_PRIVACY_POLICY_URL,
 } from './CookieConsentBanner';
 
-const CookieConsentHarness = (): JSX.Element => {
+const CookieConsentHarness = (): React.JSX.Element => {
   const [consentState, setConsentState] = useState<
     'pending' | 'accepted' | 'dismissed'
   >('pending');
