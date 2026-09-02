@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { init, EChartsOption, ECharts } from "echarts";
 import { useDeepCompareEffect } from "use-deep-compare";
 import { useResizeObserver } from '@mantine/hooks';
@@ -12,20 +12,30 @@ export interface EChartWrapperProps {
 
 const EChartWrapper: React.FC<EChartWrapperProps> = ({
   option,
+  chartRef: forwardedChartRef,
   height,
   width,
 }: EChartWrapperProps) => {
   const [chartRoot, setChartRoot] = useState<ECharts | undefined>(undefined);
   const [containerRef, rect] = useResizeObserver<HTMLDivElement>();
   const chartRef = useRef<HTMLDivElement>(null);
+  const setChartRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      chartRef.current = node;
+      if (forwardedChartRef && node) {
+        forwardedChartRef.current = node;
+      }
+    },
+    [forwardedChartRef],
+  );
 
   useDeepCompareEffect(() => {
     let chart: ECharts | undefined;
 
     if (
       chartRef.current !== null &&
-      rect.height !== 0 &&
-      rect.width !== 0
+      height !== 0 &&
+      width !== 0
     ) {
       chart = init(chartRef.current, null, {
         renderer: "svg",
@@ -41,7 +51,7 @@ const EChartWrapper: React.FC<EChartWrapperProps> = ({
     return () => {
       chart?.dispose();
     };
-  }, [containerRef, height, width, option]);
+  }, [height, width, option]);
 
   useDeepCompareEffect(() => {
     if (chartRoot && rect.height && rect.width) {
@@ -52,7 +62,7 @@ const EChartWrapper: React.FC<EChartWrapperProps> = ({
 
   return (
     <div ref={containerRef} style={{ height, width, margin: "0 auto" }}>
-      <div ref={chartRef} role="img" />
+      <div ref={setChartRef} role="img" />
     </div>
   );
 };

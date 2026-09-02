@@ -30,10 +30,10 @@ const CoreToolCard: React.FC<CoreToolCardProps> = ({
             "border-secondary-darkest border h-full w-full m-0 rounded-md p-0",
         }}
       >
-        <Grid.Col span={2} className="self-center">
+        <Grid.Col span={2} className="self-center p-2">
           {entry.icon}
         </Grid.Col>
-        <Grid.Col span={8} className="text-base-content-darkest">
+        <Grid.Col span={8} className="text-base-content-darkest p-2">
           <Text size="sm" className="font-heading font-bold">
             {entry.name}
           </Text>

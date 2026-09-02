@@ -58,7 +58,11 @@ const EChartWrapperResponsive: React.FC<EChartWrapperResponsiveProps> = ({
         ...style,
       }}
     >
-      <div ref={chartRef} role="img" />
+      <div
+        ref={chartRef}
+        role="img"
+        style={{ width: '100%', height: '100%' }}
+      />
     </div>
   );
 };
