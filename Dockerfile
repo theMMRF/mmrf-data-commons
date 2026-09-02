@@ -18,8 +18,9 @@ RUN npm config set fetch-retries 5 && \
     npm ci && \
     npm cache clean --force
 
-# Copy necessary config files
+# Copy necessary config and test-support files used during Next.js type checking
 COPY next.config.js tsconfig.json tailwind.config.js postcss.config.js ./
+COPY jest.setup.ts test-utils.tsx ./
 COPY .env.production ./
 
 # Copy source files
