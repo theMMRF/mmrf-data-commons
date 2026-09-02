@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Grid, Text } from "@mantine/core";
+import { Text } from "@mantine/core";
 import { PlayIcon } from "src/commonIcons";
 import { AppContext } from "./context";
 import { AppRegistrationEntry } from "./types";
@@ -23,30 +23,24 @@ const CoreToolCard: React.FC<CoreToolCardProps> = ({
       }}
       className="group"
     >
-      <Grid
-        classNames={{
-          root: "h-full",
-          inner:
-            "border-secondary-darkest border h-full w-full m-0 rounded-md p-0",
-        }}
-      >
-        <Grid.Col span={2} className="self-center p-2">
+      <div className="grid grid-cols-12 border-secondary-darkest border h-full w-full rounded-md">
+        <div className="col-span-2 self-center p-2">
           {entry.icon}
-        </Grid.Col>
-        <Grid.Col span={8} className="text-base-content-darkest p-2">
+        </div>
+        <div className="col-span-8 text-base-content-darkest p-2">
           <Text size="sm" className="font-heading font-bold">
             {entry.name}
           </Text>
           <Text size="xs" className="font-content leading-5">
             {entry.description}
           </Text>
-        </Grid.Col>
-        <Grid.Col span={2} className="flex justify-end p-0 m-0">
+        </div>
+        <div className="col-span-2 flex justify-end">
           <div className="bg-secondary w-12 h-full p-0 group-hover:bg-secondary-darker group-focus:bg-secondary-darker rounded-none rounded-r flex justify-center items-center">
             <PlayIcon size={30} color="white" />
           </div>
-        </Grid.Col>
-      </Grid>
+        </div>
+      </div>
     </Link>
   );
 };
