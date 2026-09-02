@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { init, EChartsOption, ECharts } from "echarts";
 import { useDeepCompareEffect } from "use-deep-compare";
 import { useResizeObserver } from '@mantine/hooks';
@@ -12,21 +12,32 @@ export interface EChartWrapperProps {
 
 const EChartWrapper: React.FC<EChartWrapperProps> = ({
   option,
+  chartRef: forwardedChartRef,
   height,
   width,
 }: EChartWrapperProps) => {
   const [chartRoot, setChartRoot] = useState<ECharts | undefined>(undefined);
-  const [containerRef, rect] = useResizeObserver();
+  const [containerRef, rect] = useResizeObserver<HTMLDivElement>();
+  const chartRef = useRef<HTMLDivElement>(null);
+  const setChartRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      chartRef.current = node;
+      if (forwardedChartRef && node) {
+        forwardedChartRef.current = node;
+      }
+    },
+    [forwardedChartRef],
+  );
 
   useDeepCompareEffect(() => {
     let chart: ECharts | undefined;
 
     if (
-      containerRef.current !== null &&
-      containerRef?.current?.clientHeight !== 0 &&
-      containerRef?.current?.clientWidth !== 0
+      chartRef.current !== null &&
+      height !== 0 &&
+      width !== 0
     ) {
-      chart = init(containerRef.current, null, {
+      chart = init(chartRef.current, null, {
         renderer: "svg",
         height,
         width,
@@ -40,7 +51,7 @@ const EChartWrapper: React.FC<EChartWrapperProps> = ({
     return () => {
       chart?.dispose();
     };
-  }, [containerRef, height, width, option]);
+  }, [height, width, option]);
 
   useDeepCompareEffect(() => {
     if (chartRoot && rect.height && rect.width) {
@@ -50,11 +61,9 @@ const EChartWrapper: React.FC<EChartWrapperProps> = ({
 
 
   return (
-    <div
-      ref={containerRef}
-      style={{ height, width, margin: "0 auto" }}
-      role="img"
-    />
+    <div ref={containerRef} style={{ height, width, margin: "0 auto" }}>
+      <div ref={setChartRef} role="img" />
+    </div>
   );
 };
 

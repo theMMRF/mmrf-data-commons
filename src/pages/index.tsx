@@ -152,6 +152,7 @@ const Tools = ({
               />
               <QueryExpression
                 index="case_centric"
+                showLogicalOperators
                 shouldShowSummary={handleQueryExpressionSummaryLogic}
                 hooks={{ useFormatFilters: () => formatGeneSymbol }}
               />
