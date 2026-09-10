@@ -73,3 +73,37 @@ test('local credentials are forwarded only to the configured HTTPS service', () 
     else process.env.NEXT_PUBLIC_GEN3_API_TARGET = originalTarget;
   }
 });
+
+
+test('upstream response errors close the downstream without an unhandled error', async () => {
+  const oldEnv = process.env.NODE_ENV;
+  const oldTarget = process.env.NEXT_PUBLIC_GEN3_API_TARGET;
+  const oldRequest = https.request;
+  process.env.NODE_ENV = 'development';
+  process.env.NEXT_PUBLIC_GEN3_API_TARGET = 'https://dev.example';
+  const incoming = new PassThrough();
+  https.request = (url, options, callback) => {
+    const request = new PassThrough();
+    request.setTimeout = () => {};
+    callback(Object.assign(incoming, { statusCode: 200, headers: {} }));
+    return request;
+  };
+  try {
+    const req = Object.assign(new PassThrough(), {
+      headers: { authorization: 'Bearer approved' }, cookies: {},
+      query: { path: ['termdb'] }, method: 'POST', url: '/api/protein-paint/termdb',
+    });
+    const res = response();
+    handler(req, res);
+    req.end();
+    incoming.write('partial');
+    incoming.destroy(new Error('upstream disconnected'));
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(res.destroyed, true);
+  } finally {
+    https.request = oldRequest;
+    if (oldEnv === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = oldEnv;
+    if (oldTarget === undefined) delete process.env.NEXT_PUBLIC_GEN3_API_TARGET;
+    else process.env.NEXT_PUBLIC_GEN3_API_TARGET = oldTarget;
+  }
+});

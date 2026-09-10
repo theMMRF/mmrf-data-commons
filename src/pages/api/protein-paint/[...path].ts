@@ -47,6 +47,7 @@ export default function proxy(req: NextApiRequest, res: NextApiResponse) {
     res.writeHead(response.statusCode || 502, {
       ...response.headers, 'cache-control': 'private, no-store',
     });
+    response.on('error', () => res.destroy());
     response.pipe(res);
   });
   upstream.setTimeout(180000, () => upstream.destroy());
