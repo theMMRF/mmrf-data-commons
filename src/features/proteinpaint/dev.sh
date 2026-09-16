@@ -24,7 +24,7 @@ else
 	npm link ../proteinpaint/client
 fi
 
-PROTEINPAINT_API="http://localhost:3000" PORT=3333 npm run dev
+PORT=3333 npm run dev
 #
 # close all open Chrome browser windows and in macOS terminal:
 # open -n /Applications/Google\ Chrome.app --args --user-data-dir="/tmp/chrome-dev-session" --disable-web-security
