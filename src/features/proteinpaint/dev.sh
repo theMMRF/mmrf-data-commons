@@ -24,7 +24,9 @@ else
 	npm link ../proteinpaint/client
 fi
 
-PROTEINPAINT_API=http://localhost:3000 \
+# Browser requests stay on the frontend origin; Next proxies them to local PP.
+# Bind the frontend and PP server to localhost for local development.
+PROTEINPAINT_API="${PROTEINPAINT_API:-http://localhost:3000}" \
 NEXT_PUBLIC_PROTEINPAINT_API=/protein-paint \
 NEXT_PUBLIC_GEN3_API=http://localhost:3333 \
 NEXT_PUBLIC_GEN3_API_TARGET=https://dev-virtuallab.themmrf.org \

@@ -12,7 +12,8 @@ export default function proxy(req: NextApiRequest, res: NextApiResponse) {
     res.status(404).end();
     return;
   }
-  const base = process.env.NEXT_PUBLIC_GEN3_API_TARGET;
+  const localBase = process.env.PROTEINPAINT_API;
+  const base = localBase || process.env.NEXT_PUBLIC_GEN3_API_TARGET;
   if (!base) {
     res.status(503).json({ error: 'Set NEXT_PUBLIC_GEN3_API_TARGET for local API access' });
     return;
@@ -22,28 +23,53 @@ export default function proxy(req: NextApiRequest, res: NextApiResponse) {
     res.status(400).end();
     return;
   }
-  const target = new URL(base);
-  if (target.protocol !== 'https:') {
+  let target: URL;
+  try {
+    target = new URL(base);
+  } catch {
+    res.status(503).json({ error: 'Invalid ProteinPaint proxy target URL' });
+    return;
+  }
+  if (target.username || target.password || target.search || target.hash || target.pathname !== '/') {
+    res.status(503).json({ error: 'Configure the proxy target as an origin without credentials or a path' });
+    return;
+  }
+  if (localBase && (!['localhost', '127.0.0.1', '[::1]'].includes(target.hostname) ||
+      !['http:', 'https:'].includes(target.protocol))) {
+    res.status(503).json({ error: 'PROTEINPAINT_API must be a localhost HTTP or HTTPS origin' });
+    return;
+  }
+  if (!localBase && target.protocol !== 'https:') {
     res.status(503).json({ error: 'The dev API target must use HTTPS' });
     return;
   }
-  target.pathname = `/protein-paint/${path.map(encodeURIComponent).join('/')}`;
+  if (!localBase && ![
+    'https://dev-virtuallab.themmrf.org',
+    'https://virtuallab.themmrf.org',
+  ].includes(target.origin)) {
+    res.status(503).json({ error: 'Remote ProteinPaint target must be an approved MMRF commons origin' });
+    return;
+  }
+  target.pathname = `${localBase ? '' : '/protein-paint'}/${path.map(encodeURIComponent).join('/')}`;
   const incoming = new URL(req.url || '/', 'http://localhost');
   target.search = incoming.search;
   target.searchParams.delete('path');
   const authorization = req.headers.authorization ??
     ((req.cookies.access_token || req.cookies.credentials_token)
       ? `Bearer ${req.cookies.access_token || req.cookies.credentials_token}` : undefined);
-  if (!authorization) {
+  if (!localBase && !authorization) {
     res.status(401).json({ error: 'Sign in with dev credentials first' });
     return;
   }
   const headers: http.OutgoingHttpHeaders = {
     ...req.headers, host: target.host, authorization,
   };
+  // The local PP server has its own API identity; never send it Gen3 credentials.
+  if (localBase) delete headers.authorization;
   delete headers.cookie;
   delete headers['proxy-authorization'];
-  const upstream = https.request(target, { method: req.method, headers }, (response) => {
+  const transport = target.protocol === 'http:' ? http : https;
+  const upstream = transport.request(target, { method: req.method, headers }, (response) => {
     res.writeHead(response.statusCode || 502, {
       ...response.headers, 'cache-control': 'private, no-store',
     });
