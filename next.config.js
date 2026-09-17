@@ -25,7 +25,9 @@ const termsApiRewrites = [
   { source: '/terms-api/accept', destination: '/api/terms/accept' },
 ];
 
-const PROTEINPAINT_API = process.env.PROTEINPAINT_API || '/api/protein-paint/'
+const PROTEINPAINT_API = (
+  process.env.PROTEINPAINT_API || '/api/protein-paint'
+).replace(/\/+$/, '');
 
 // Next configuration with support for rewrting API to existing common services
 const nextConfig = {
