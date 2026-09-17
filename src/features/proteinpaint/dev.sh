@@ -28,4 +28,6 @@ fi
 # Bind the frontend and PP server to localhost for local development.
 PROTEINPAINT_API="${PROTEINPAINT_API:-http://localhost:3000}" \
 NEXT_PUBLIC_PROTEINPAINT_API=/protein-paint \
-NEXT_PUBLIC_GEN3_API=http://localhost:3333 PORT=3333 npm run dev -- --hostname 127.0.0.1
+NEXT_PUBLIC_GEN3_API=http://localhost:3333 \
+NEXT_PUBLIC_GEN3_API_TARGET=https://dev-virtuallab.themmrf.org \
+PORT=3333 npm run dev -- --hostname 127.0.0.1
