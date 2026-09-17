@@ -30,7 +30,7 @@ NEXT_PUBLIC_GEN3_API_TARGET=https://dev-virtuallab.themmrf.org \
 PORT=3333 npm run dev -- --hostname 127.0.0.1
 ```
 
-Sign in with your dev user credentials. The proxy requires a bearer token or an access_token/credentials_token cookie and forwards a bearer token to the HTTPS commons `/protein-paint` service. It never substitutes the PP service account. A malformed header does not fall back to a cookie. The hosted deployment is unchanged by this development-only route.
+Sign in with your dev user credentials. The proxy requires a bearer token or an access_token/credentials_token cookie and forwards a bearer token to the HTTPS commons `/protein-paint` service. Remote forwarding is restricted to the exact HTTPS origins dev-virtuallab.themmrf.org and virtuallab.themmrf.org on the default HTTPS port. It never substitutes the PP service account. A malformed header does not fall back to a cookie. The hosted deployment is unchanged by this development-only route.
 
 ## What can be tested without St. Jude's full backend
 

@@ -43,6 +43,13 @@ export default function proxy(req: NextApiRequest, res: NextApiResponse) {
     res.status(503).json({ error: 'The dev API target must use HTTPS' });
     return;
   }
+  if (!localBase && ![
+    'https://dev-virtuallab.themmrf.org',
+    'https://virtuallab.themmrf.org',
+  ].includes(target.origin)) {
+    res.status(503).json({ error: 'Remote ProteinPaint target must be an approved MMRF commons origin' });
+    return;
+  }
   target.pathname = `${localBase ? '' : '/protein-paint'}/${path.map(encodeURIComponent).join('/')}`;
   const incoming = new URL(req.url || '/', 'http://localhost');
   target.search = incoming.search;

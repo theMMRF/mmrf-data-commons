@@ -31,7 +31,7 @@ test('local credentials are forwarded only to the configured HTTPS service', () 
   const originalRequest = https.request;
   const captured = [];
   process.env.NODE_ENV = 'development';
-  process.env.NEXT_PUBLIC_GEN3_API_TARGET = 'https://dev.example';
+  process.env.NEXT_PUBLIC_GEN3_API_TARGET = 'https://dev-virtuallab.themmrf.org';
   https.request = (url, options) => {
     captured.push({ url, options });
     const stream = new PassThrough();
@@ -48,10 +48,10 @@ test('local credentials are forwarded only to the configured HTTPS service', () 
     handler(req, response());
     req.end();
     assert.equal(captured.length, 1);
-    assert.equal(captured[0].url.href, 'https://dev.example/protein-paint/termdb?genome=hg38');
+    assert.equal(captured[0].url.href, 'https://dev-virtuallab.themmrf.org/protein-paint/termdb?genome=hg38');
     assert.equal(captured[0].options.headers.authorization, 'Bearer test-local');
     assert.equal(captured[0].options.headers.cookie, undefined);
-    assert.equal(captured[0].options.headers.host, 'dev.example');
+    assert.equal(captured[0].options.headers.host, 'dev-virtuallab.themmrf.org');
 
     const anonymous = makeRequest(); anonymous.cookies = {}; anonymous.headers = {};
     const denied = response(); handler(anonymous, denied);
@@ -80,7 +80,7 @@ test('upstream response errors close the downstream without an unhandled error',
   const oldTarget = process.env.NEXT_PUBLIC_GEN3_API_TARGET;
   const oldRequest = https.request;
   process.env.NODE_ENV = 'development';
-  process.env.NEXT_PUBLIC_GEN3_API_TARGET = 'https://dev.example';
+  process.env.NEXT_PUBLIC_GEN3_API_TARGET = 'https://dev-virtuallab.themmrf.org';
   const incoming = new PassThrough();
   https.request = (url, options, callback) => {
     const request = new PassThrough();
@@ -174,5 +174,30 @@ test('local override rejects remote hosts and malformed targets', () => {
   } finally {
     if (originalEnv === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = originalEnv;
     if (originalPP === undefined) delete process.env.PROTEINPAINT_API; else process.env.PROTEINPAINT_API = originalPP;
+  }
+});
+
+
+test('unapproved HTTPS commons cannot receive caller credentials', () => {
+  const original = { ...process.env };
+  const oldRequest = https.request;
+  process.env.NODE_ENV = 'development';
+  delete process.env.PROTEINPAINT_API;
+  let calls = 0;
+  https.request = () => { calls++; throw new Error('Must not contact unapproved origin'); };
+  try {
+    for (const target of ['https://unapproved.example', 'https://dev-virtuallab.themmrf.org:444', 'https://dev-virtuallab.themmrf.org.unapproved.example']) {
+      process.env.NEXT_PUBLIC_GEN3_API_TARGET = target;
+      const res = response();
+      handler({ query: { path: ['genomes'] }, headers: { authorization: 'Bearer private-token' },
+        cookies: { credentials_token: 'private-token' } }, res);
+      assert.equal(res.statusCode, 503);
+    }
+    assert.equal(calls, 0);
+  } finally {
+    https.request = oldRequest;
+    for (const key of ['NODE_ENV', 'PROTEINPAINT_API', 'NEXT_PUBLIC_GEN3_API_TARGET']) {
+      if (original[key] === undefined) delete process.env[key]; else process.env[key] = original[key];
+    }
   }
 });
