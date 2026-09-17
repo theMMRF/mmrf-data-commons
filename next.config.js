@@ -25,6 +25,8 @@ const termsApiRewrites = [
   { source: '/terms-api/accept', destination: '/api/terms/accept' },
 ];
 
+const PROTEINPAINT_API = process.env.PROTEINPAINT_API || '/api/protein-paint/'
+
 // Next configuration with support for rewrting API to existing common services
 const nextConfig = {
   output: 'standalone',
@@ -37,7 +39,7 @@ const nextConfig = {
   },
   // support npm-linked modules like protenpaint-client that are tracked under the parent directory
   // of the mmrf-data-commons repo, not within it
-  outputFileTracingRoot: path.join(__dirname, '../'), // process.env.PROTEINPAINT_API ? path.join(__dirname, '../') : undefined,
+  outputFileTracingRoot: process.env.PROTEINPAINT_API ? path.join(__dirname, '../') : undefined,
   transpilePackages: ['@gen3/core', '@gen3/frontend'],
   webpack: (config) => {
     config.infrastructureLogging = {
@@ -51,7 +53,7 @@ const nextConfig = {
         process.env.NEXT_PUBLIC_GEN3_API_TARGET || 'https://localhost';
       return [
         ...termsApiRewrites,
-        { source: "/protein-paint/:path*", destination: "/api/protein-paint/:path*" },
+        { source: "/protein-paint/:path*", destination: `${PROTEINPAINT_API}/:path*` },
         { source: '/_status', destination: `${GEN3_TARGET}/_status` },
         { source: '/user/:path*', destination: `${GEN3_TARGET}/user/:path*` },
         {

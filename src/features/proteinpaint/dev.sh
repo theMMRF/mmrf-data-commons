@@ -24,7 +24,12 @@ else
 	npm link ../proteinpaint/client
 fi
 
-PORT=3333 npm run dev
+PROTEINPAINT_API=http://localhost:3000 \
+NEXT_PUBLIC_PROTEINPAINT_API=/protein-paint \
+NEXT_PUBLIC_GEN3_API=http://localhost:3333 \
+NEXT_PUBLIC_GEN3_API_TARGET=https://dev-virtuallab.themmrf.org \
+PORT=3333 npm run dev -- --hostname 127.0.0.1
+
 #
 # close all open Chrome browser windows and in macOS terminal:
 # open -n /Applications/Google\ Chrome.app --args --user-data-dir="/tmp/chrome-dev-session" --disable-web-security
