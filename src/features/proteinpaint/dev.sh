@@ -24,10 +24,8 @@ else
 	npm link ../proteinpaint/client
 fi
 
-PROTEINPAINT_API="http://localhost:3000" PORT=3333 npm run dev
-#
-# close all open Chrome browser windows and in macOS terminal:
-# open -n /Applications/Google\ Chrome.app --args --user-data-dir="/tmp/chrome-dev-session" --disable-web-security
-#
-# TODO: setup and use https://localhost.dev-virtuallab.themmrf.org using local-ssl-proxy or with nginx
-#
+# Browser requests stay on the frontend origin; Next proxies them to local PP.
+# Bind the frontend and PP server to localhost for local development.
+PROTEINPAINT_API="${PROTEINPAINT_API:-http://localhost:3000}" \
+NEXT_PUBLIC_PROTEINPAINT_API=/protein-paint \
+NEXT_PUBLIC_GEN3_API=http://localhost:3333 PORT=3333 npm run dev -- --hostname 127.0.0.1
