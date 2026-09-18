@@ -25,10 +25,6 @@ const termsApiRewrites = [
   { source: '/terms-api/accept', destination: '/api/terms/accept' },
 ];
 
-const PROTEINPAINT_API = (
-  process.env.PROTEINPAINT_API || '/api/protein-paint'
-).replace(/\/+$/, '');
-
 // Next configuration with support for rewrting API to existing common services
 const nextConfig = {
   output: 'standalone',
@@ -55,7 +51,7 @@ const nextConfig = {
         process.env.NEXT_PUBLIC_GEN3_API_TARGET || 'https://localhost';
       return [
         ...termsApiRewrites,
-        { source: "/protein-paint/:path*", destination: `${PROTEINPAINT_API}/:path*` },
+        { source: '/protein-paint/:path*', destination: '/api/protein-paint/:path*' },
         { source: '/_status', destination: `${GEN3_TARGET}/_status` },
         { source: '/user/:path*', destination: `${GEN3_TARGET}/user/:path*` },
         {

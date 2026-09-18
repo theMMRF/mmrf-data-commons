@@ -17,6 +17,27 @@ handlerModule.paths = module.paths;
 handlerModule._compile(compiled, filename);
 const handler = handlerModule.exports.default;
 
+test('development rewrites always use the PP handler for local and remote targets', async () => {
+  const oldEnv = process.env.NODE_ENV;
+  const oldTarget = process.env.PROTEINPAINT_API;
+  const configPath = require.resolve('../next.config.js');
+  try {
+    process.env.NODE_ENV = 'development';
+    for (const target of [undefined, 'http://localhost:3000', 'http://localhost:3000/']) {
+      if (target === undefined) delete process.env.PROTEINPAINT_API;
+      else process.env.PROTEINPAINT_API = target;
+      delete require.cache[configPath];
+      const rewrites = await require(configPath).rewrites();
+      assert.equal(rewrites.find(route => route.source === '/protein-paint/:path*').destination,
+        '/api/protein-paint/:path*');
+    }
+  } finally {
+    delete require.cache[configPath];
+    if (oldEnv === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = oldEnv;
+    if (oldTarget === undefined) delete process.env.PROTEINPAINT_API; else process.env.PROTEINPAINT_API = oldTarget;
+  }
+});
+
 function response() {
   const res = new PassThrough();
   res.status = code => { res.statusCode = code; return res; };
