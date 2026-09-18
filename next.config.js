@@ -51,6 +51,7 @@ const nextConfig = {
         process.env.NEXT_PUBLIC_GEN3_API_TARGET || 'https://localhost';
       return [
         ...termsApiRewrites,
+        { source: '/protein-paint/:path*', destination: '/api/protein-paint/:path*' },
         { source: '/_status', destination: `${GEN3_TARGET}/_status` },
         { source: '/user/:path*', destination: `${GEN3_TARGET}/user/:path*` },
         {
