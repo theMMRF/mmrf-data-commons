@@ -70,5 +70,36 @@ describe('middleware', () => {
     const response = await middleware(request('/'));
 
     expect(response?.headers.get('location')).toBeNull();
+    expect(mockedGetLoginStatus).toHaveBeenCalledTimes(1);
+    expect(mockedFetchTermsAcceptedFromBff).toHaveBeenCalledWith(
+      expect.any(NextRequest),
+      { status: 'issued' },
+    );
+  });
+
+  it('checks latest terms again on the next navigation', async () => {
+    mockedGetLoginStatus.mockResolvedValue({ status: 'issued' });
+    mockedFetchTermsAcceptedFromBff
+      .mockResolvedValueOnce({ isLoggedIn: true, hasAcceptedLatestTerms: true })
+      .mockResolvedValueOnce({
+        isLoggedIn: true,
+        hasAcceptedLatestTerms: false,
+      });
+    expect((await middleware(request('/'))).headers.get('location')).toBeNull();
+    const next = await middleware(request('/?app=ProteinPaint'));
+    expect(new URL(next.headers.get('location')!).pathname).toBe(
+      '/TermsAcceptance',
+    );
+    expect(mockedFetchTermsAcceptedFromBff).toHaveBeenCalledTimes(2);
+  });
+
+  it('redirects to login when the terms API rejects the session', async () => {
+    mockedGetLoginStatus.mockResolvedValue({ status: 'issued' });
+    mockedFetchTermsAcceptedFromBff.mockResolvedValue({
+      isLoggedIn: false,
+      hasAcceptedLatestTerms: true,
+    });
+    const response = await middleware(request('/?app=ProteinPaint'));
+    expect(new URL(response.headers.get('location')!).pathname).toBe('/Login');
   });
 });
