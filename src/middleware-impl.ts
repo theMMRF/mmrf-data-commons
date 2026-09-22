@@ -65,9 +65,11 @@ export async function middleware(req: NextRequest) {
     const loginStatus = await getRequestLoginStatus();
 
     if (loginStatus.status === 'issued') {
-      const termsGate = await fetchTermsAcceptedFromBff(req);
+      const termsGate = await fetchTermsAcceptedFromBff(req, loginStatus);
 
-      if (termsGate.isLoggedIn && !termsGate.hasAcceptedLatestTerms) {
+      if (!termsGate.isLoggedIn) return redirectToLogin(req);
+
+      if (!termsGate.hasAcceptedLatestTerms) {
         const termsUrl = new URL('/TermsAcceptance', req.url);
         termsUrl.searchParams.set(
           'referer',

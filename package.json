@@ -20,7 +20,8 @@
     "build:middlewarePaths": "node ./node_modules/@gen3/toolsff/dist/scanSitePaths.esm.js",
     "getSchema": "node ./node_modules/@gen3/toolsff/dist/getSchema.esm.js --out=config/",
     "getDRSToHostname": "node ./node_modules/@gen3/toolsff/dist/getDRSToHostname.esm.js --out=config/",
-    "test:metadata-auth": "node --test test/protein-paint-auth.test.cjs"
+    "test:metadata-auth": "node --test test/protein-paint-auth.test.cjs",
+    "test:navigation-auth": "node --test test/navigation-auth.test.cjs && jest --runInBand src/middleware-impl.unit.test.ts"
   },
   "dependencies": {
     "@fontsource/montserrat": "^5.2.8",
