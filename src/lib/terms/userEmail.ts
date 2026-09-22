@@ -1,6 +1,10 @@
 import { decodeJwt } from 'jose';
 import { GEN3_API } from '@gen3/core/server';
-import { getAccessToken, getLoginStatus } from '@/lib/auth/getLoginStatus';
+import {
+  getAccessToken,
+  getLoginStatus,
+  type LoginStatus,
+} from '@/lib/auth/getLoginStatus';
 import { buildAbsoluteGen3Url } from './requestOrigin';
 
 const normalizeBase = (value?: string): string | undefined => {
@@ -62,7 +66,9 @@ export const fetchUserProfile = async (
   accessToken: string,
   requestOrigin?: string,
 ): Promise<Record<string, unknown> | null> => {
-  const gen3ApiBase = normalizeBase(typeof GEN3_API === 'string' ? GEN3_API : undefined);
+  const gen3ApiBase = normalizeBase(
+    typeof GEN3_API === 'string' ? GEN3_API : undefined,
+  );
   const profileUrl =
     buildAbsoluteGen3Url('/user/user', requestOrigin) ??
     (gen3ApiBase ? `${gen3ApiBase}/user/user` : undefined);
@@ -88,8 +94,13 @@ export const fetchUserProfile = async (
 export const resolveUserIdentity = async (
   cookieHeader?: string,
   requestOrigin?: string,
+  verifiedLoginStatus?: LoginStatus,
 ): Promise<ResolvedUserIdentity> => {
-  const loginStatus = await getLoginStatus(cookieHeader);
+  // Callers may reuse a result verified for this same request, never a value
+  // supplied in HTTP headers or persisted from an earlier request.
+  const loginStatus =
+    verifiedLoginStatus ?? (await getLoginStatus(cookieHeader));
+  if (loginStatus.status !== 'issued') return {};
   const fromContextEmail = extractEmailFromUserRecord(loginStatus.userContext);
   const fromContextName = extractNameFromUserRecord(loginStatus.userContext);
 
