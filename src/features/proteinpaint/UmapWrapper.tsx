@@ -8,8 +8,6 @@ import {
   //PROTEINPAINT_API,
   useFetchUserDetailsQuery,
   useCoreDispatch,
-  selectAvailableCohorts,
-  EmptyFilterSet,
   convertFilterSetToGqlFilter as buildCohortGqlOperator
 } from "@gen3/core";
 import { isEqual, cloneDeep } from "lodash";
@@ -23,25 +21,13 @@ interface PpProps {
   basepath?: string;
 }
 
-export const DEwrapper: FC<PpProps> = (props: PpProps) => {
+export const UmapWrapper: FC<PpProps> = (props: PpProps) => {
   const isDemoMode = useIsDemoApp();
   const currentCohort = useCoreSelector((state) =>
     selectCurrentCohortCaseFilters(state, COHORT_FILTER_INDEX),
   );
   const filter0 = isDemoMode ? null : buildCohortGqlOperator(currentCohort);
   const userDetails = useFetchUserDetailsQuery()
-
-  // get all cohorts built by user
-  const cohorts = useCoreSelector((state) => selectAvailableCohorts(state));
-  const cohorts0 = cohorts.map((cohort) => {
-    return {
-      id: cohort.id,
-      name: cohort.name,
-      count: cohort.counts?.[COHORT_FILTER_INDEX],
-      // restructure cohort filter into gql filter (same structure as filter0)
-      filter: buildCohortGqlOperator(cohort.filters?.[COHORT_FILTER_INDEX] ?? EmptyFilterSet)
-    }
-  });
 
   // to track reusable instance for mds3 skewer track
   const prevArg = useRef<any>({});
@@ -72,8 +58,7 @@ export const DEwrapper: FC<PpProps> = (props: PpProps) => {
   useDeepCompareEffect(
     () => {
       const rootElem = divRef.current;
-
-      const data = getDEtrack(props, filter0, cohorts0);
+      const data = getUmapTrack(props, filter0);
       if (!data) return;
       /*if (isDemoMode) {
         data.geneSymbol = props.hardcodeCnvOnly
@@ -110,7 +95,7 @@ export const DEwrapper: FC<PpProps> = (props: PpProps) => {
       });
     },
 
-    [ isDemoMode, filter0, cohorts0, userDetails.currentData ],
+    [ isDemoMode, filter0, userDetails.currentData ],
   );
 
   const divRef = useRef<HTMLDivElement>(null);
@@ -134,42 +119,30 @@ export const DEwrapper: FC<PpProps> = (props: PpProps) => {
   );
 };
 
-interface Cohort0 {
-  id: string;
-  name: string;
-  count: number;
-  filter: FilterSet;
-}
-
-interface DEargOpts {
-  cohorts0?: Cohort0[];
-}
-
 interface Mds3Arg {
   dslabel?: string;
+  genome?: string;
   holder?: HTMLElement;
   noheader?: boolean;
   nobox?: boolean;
   hide_dsHandles?: boolean;
   host: string;
   filter0?: FilterSet;
-  opts?: DEargOpts;
-  launchGdcDE?: boolean;
+  launchGdcScatter: { plotName: string };
 }
 
-function getDEtrack(
+function getUmapTrack(
   props: PpProps,
-  filter0: any,
-  cohorts0: any
+  filter0: any
 ) {
   const arg: Mds3Arg = {
     dslabel: 'MMRF',
+    genome: 'hg38',
     // host in gdc is just a relative url path,
     // using the same domain as the GDC portal where PP is embedded
     host: props.basepath || (basepath as string),
-    launchGdcDE: true,
-    filter0,
-    opts: { cohorts0 }
+    launchGdcScatter: { plotName: 'Bulk RNA-seq UMAP' },
+    filter0
   };
 
   return arg;
