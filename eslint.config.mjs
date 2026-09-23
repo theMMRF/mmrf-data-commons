@@ -66,5 +66,15 @@ export default [
       'react/prop-types': 'warn',
     },
   },
+  {
+    files: ['test/**/*.cjs'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: globals.node,
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
   ...storybook.configs["flat/recommended"]
 ];
