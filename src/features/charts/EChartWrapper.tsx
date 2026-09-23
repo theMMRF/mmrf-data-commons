@@ -5,7 +5,7 @@ import { useResizeObserver } from '@mantine/hooks';
 
 export interface EChartWrapperProps {
   readonly option: EChartsOption;
-  readonly chartRef?: React.MutableRefObject<HTMLElement>;
+  readonly chartRef?: React.MutableRefObject<HTMLElement | null>;
   readonly height: number;
   readonly width: number;
 }
@@ -22,7 +22,7 @@ const EChartWrapper: React.FC<EChartWrapperProps> = ({
   const setChartRef = useCallback(
     (node: HTMLDivElement | null) => {
       chartRef.current = node;
-      if (forwardedChartRef && node) {
+      if (forwardedChartRef) {
         forwardedChartRef.current = node;
       }
     },
