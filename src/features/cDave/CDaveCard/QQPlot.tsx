@@ -51,7 +51,7 @@ interface QQPlotProps {
   readonly color: string;
   readonly height: number;
   readonly width: number;
-  readonly chartRef?: React.MutableRefObject<HTMLElement>;
+  readonly chartRef?: React.MutableRefObject<HTMLElement | null>;
   readonly label?: string;
 }
 
