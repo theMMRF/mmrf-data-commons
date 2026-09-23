@@ -36,6 +36,9 @@ const isFontRule = (rule: CSSRule): rule is CSSFontFaceRule => {
  * @returns Blob containing the new SVG content
  */
 const createSVG = async (element: HTMLElement): Promise<Blob> => {
+  // Preserve the selected chart before font loading can yield to a re-render.
+  const elementClone = document.importNode(element, true);
+  const { width, height } = element.getBoundingClientRect();
   const svgElement = document.createElementNS(
     "http://www.w3.org/2000/svg",
     "svg",
@@ -85,13 +88,13 @@ const createSVG = async (element: HTMLElement): Promise<Blob> => {
   );
   chartWrapper.setAttribute(
     "width",
-    `${element.getBoundingClientRect().width + EXTRA_PADDING}`,
+    `${width + EXTRA_PADDING}`,
   );
   chartWrapper.setAttribute(
     "height",
-    `${element.getBoundingClientRect().height + EXTRA_PADDING}`,
+    `${height + EXTRA_PADDING}`,
   );
-  chartWrapper.append(document.importNode(element, true));
+  chartWrapper.append(elementClone);
   svgElement.append(chartWrapper);
 
   const svgBlob = new Blob(
@@ -133,11 +136,12 @@ export const handleDownloadPNG = async (
   const element = ref.current;
   if (!element) return;
 
+  const { width, height } = element.getBoundingClientRect();
   const svgBlob = await createSVG(element);
   const svgHref = URL.createObjectURL(svgBlob);
   const svgImage = new Image(
-    element.getBoundingClientRect().width + EXTRA_PADDING,
-    element.getBoundingClientRect().height + EXTRA_PADDING,
+    width + EXTRA_PADDING,
+    height + EXTRA_PADDING,
   );
   const canvas = document.createElement("canvas");
   const canvasCtx = canvas.getContext("2d");
