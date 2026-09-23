@@ -3,6 +3,7 @@ import {
   convertFilterSetToGqlFilter,
   EmptyFilterSet,
   FilterSet,
+  joinFilters,
 } from '@gen3/core';
 import { ButtonProps, Tooltip } from "@mantine/core";
 import tw from "tailwind-styled-components";
@@ -77,6 +78,7 @@ interface CohortCreationButtonProps {
   readonly caseFilter: FilterSet;
   readonly filtersCallback?: () => Promise<FilterSet>;
   readonly createStaticCohort?: boolean;
+  readonly asFilterRepresentation?: boolean;
 }
 
 /**
@@ -91,7 +93,8 @@ const CohortCreationButton: React.FC<CohortCreationButtonProps> = ({
                                                                      label,
                                                                      numCases,
                                                                      filter,
-                                                                     caseFilter
+                                                                     caseFilter,
+                                                                     asFilterRepresentation = false,
 }: CohortCreationButtonProps) => {
   const [loading, setLoading] = useState(false);
   const disabled = numCases === undefined || numCases === 0;
@@ -141,6 +144,16 @@ const CohortCreationButton: React.FC<CohortCreationButtonProps> = ({
           data-testid="button-save-filtered-cohort"
           onClick={async () => {
             if (loading) {
+              return;
+            }
+
+            if (asFilterRepresentation) {
+              openModalWithCohortFilterRepresentation(
+                joinFilters(
+                  caseFilter ?? EmptyFilterSet,
+                  filter ?? EmptyFilterSet,
+                ),
+              );
               return;
             }
 
