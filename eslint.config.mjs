@@ -16,10 +16,12 @@ export default [
   reactRecommended,
   jsLint.configs.recommended,
   ...tsLint.configs.recommended,
-  next.flatConfig.recommended,
+  next.configs.recommended,
   {
     ignores: [
       '.nx/**/*',
+      '.next/**/*',
+      '.yalc/**/*',
       '**/build/*',
       '**/*.css',
       'setupTests.ts',
@@ -55,13 +57,23 @@ export default [
     plugins: {
       '@typescript-eslint': typescriptEslint,
       react: react,
-      next: next,
       'react-hooks': reactHooks,
     },
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-require-imports': 'off',
       '@typescript-eslint/no-unused-vars': 'warn',
       'react/prop-types': 'warn',
+    },
+  },
+  {
+    files: ['test/**/*.cjs'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: globals.node,
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
     },
   },
   ...storybook.configs["flat/recommended"]

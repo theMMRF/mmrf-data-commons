@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
 import PageTitle from '@/components/PageTitle';
 import {
-  AnalysisCenterWithSections,
   AnalysisPageGetServerSideProps as baseGetServerSideProps,
   AnalysisPageLayoutProps,
   AnalysisToolConfiguration,
@@ -22,6 +21,7 @@ import {
 } from '@gen3/core';
 import { Text} from "@mantine/core";
 import AnalysisWorkspace from '@/components/analysis/AnalysisWorkspace';
+import AnalysisToolSections from '@/components/analysis/AnalysisToolSections';
 import AdditionalCohortSelection from '@/features/cohortComparison/AdditionalCohortSelection';
 import { useDeepCompareEffect } from 'use-deep-compare';
 import { getCustomCohortButtons } from '@/features/cohort/getCustomCohortButtons';
@@ -29,7 +29,8 @@ import { useProjectId } from '@/hooks/useAppFilters';
 import { formatGeneSymbol } from '@/utils/formatQueryExpressionValues';
 
 const PROD_HOSTNAME = 'virtuallab.themmrf.org';
-const PROD_HIDDEN_APP_IDS = new Set<string>();
+// Hold back the card in production; keep dev and direct URL access available.
+const PROD_HIDDEN_APP_IDS = new Set<string>(['Umap']);
 
 interface CountsPanelProps {
   index: string;
@@ -152,6 +153,7 @@ const Tools = ({
               />
               <QueryExpression
                 index="case_centric"
+                showLogicalOperators
                 shouldShowSummary={handleQueryExpressionSummaryLogic}
                 hooks={{ useFormatFilters: () => formatGeneSymbol }}
               />
@@ -168,7 +170,7 @@ const Tools = ({
             <AnalysisWorkspace appInfo={appInfo} />
           ) : visibleSections ? (
             <div className="mx-4 mb-6 pr-[300px]">
-              <AnalysisCenterWithSections
+              <AnalysisToolSections
                 sections={visibleSections}
                 classNames={classNames}
               />

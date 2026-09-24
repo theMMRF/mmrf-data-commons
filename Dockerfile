@@ -1,7 +1,7 @@
 # docker build -t ff .
 # docker run -p 3000:3000 -it ff
 # Build stage
-FROM --platform=$BUILDPLATFORM node:24.14.0-trixie-slim AS builder
+FROM --platform=$BUILDPLATFORM node:24.18.1-trixie-slim AS builder
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
@@ -18,8 +18,9 @@ RUN npm config set fetch-retries 5 && \
     npm ci && \
     npm cache clean --force
 
-# Copy necessary config files
+# Copy necessary config and test-support files used during Next.js type checking
 COPY next.config.js tsconfig.json tailwind.config.js postcss.config.js ./
+COPY jest.setup.ts test-utils.tsx ./
 COPY .env.production ./
 
 # Copy source files
@@ -34,7 +35,7 @@ RUN npm run build && \
     npm prune --omit=dev;
 
 # Production stage
-FROM node:24.14.0-trixie-slim AS runner
+FROM node:24.18.1-trixie-slim AS runner
 
 WORKDIR /gen3
 
