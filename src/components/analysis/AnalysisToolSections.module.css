@@ -1,0 +1,11 @@
+/* Gen3 0.12.66 core cards still assume the padded columns from Mantine 8.
+   Mantine 9 uses gaps instead. Restore the original 2/8/2 column layout and
+   inset only within this tool list; the launch-arrow column stays unpadded. */
+.toolSections :global(.mantine-Grid-root) {
+  --grid-column-gap: 0px;
+  --grid-row-gap: 0px;
+}
+
+.toolSections :global(.mantine-Grid-inner) > :global(.mantine-Grid-col):not(:last-child) {
+  padding: calc(var(--mantine-spacing-md) / 2);
+}

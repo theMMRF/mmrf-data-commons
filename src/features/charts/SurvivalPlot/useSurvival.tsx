@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, MouseEvent } from "react";
+import React, { useCallback, useLayoutEffect, MouseEvent, useRef } from "react";
 import { renderPlot } from "@oncojs/survivalplot";
 import { useResizeObserver } from "@mantine/hooks";
 import { MINIMUM_CASES, UseSurvivalType,  } from "./types";
@@ -37,13 +37,21 @@ export const useSurvival: UseSurvivalType = (
   setTooltip = (_x?) => null,
   setEntityMetadata,
 ) => {
-  const [ref, rect] = useResizeObserver();
+  const [resizeRef, rect] = useResizeObserver<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const ref = useCallback(
+    (node: HTMLDivElement | null) => {
+      containerRef.current = node;
+      resizeRef(node);
+    },
+    [resizeRef],
+  );
 
   useLayoutEffect(() => {
-    if (ref.current) {
+    if (containerRef.current) {
       renderPlot({
         height,
-        container: ref.current,
+        container: containerRef.current,
         palette: textColors,
         margins: SVG_MARGINS,
         dataSets: data,

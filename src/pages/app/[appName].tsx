@@ -48,6 +48,7 @@ const AppsPage = ({ config }: AppConfig) => {
         <CohortManager />
         <QueryExpression
           index="cases"
+          showLogicalOperators
           hooks={{ useFormatFilters: () => formatGeneSymbol }}
         />
         <div className="w-full overflow-y-auto">

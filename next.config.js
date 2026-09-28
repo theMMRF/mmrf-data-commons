@@ -25,13 +25,18 @@ const termsApiRewrites = [
   { source: '/terms-api/accept', destination: '/api/terms/accept' },
 ];
 
+const basePath = process.env.BASE_PATH || '';
+
 // Next configuration with support for rewrting API to existing common services
 const nextConfig = {
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
   output: 'standalone',
   reactStrictMode: true,
   productionBrowserSourceMaps: true,
   pageExtensions: ['mdx', 'md', 'jsx', 'js', 'tsx', 'ts'],
-  basePath: process.env.BASE_PATH || '',
+  basePath,
   experimental: {
     esmExternals: true,
   },

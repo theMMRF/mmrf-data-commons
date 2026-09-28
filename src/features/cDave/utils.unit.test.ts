@@ -13,21 +13,17 @@ describe('filterUsefulFacets', () => {
   it('remove empty bucket fields', () => {
     expect(
       filterUsefulFacets({
-        'demographic.gender': {
-          buckets: [
-            { count: 10, key: 'female' },
-            { count: 25, key: 'male' },
-          ],
-        },
-        'demographic.race': { buckets: [{ key: '_missing', count: 35 }] },
-      }),
-    ).toEqual({
-      'demographic.gender': {
-        buckets: [
+        'demographic.gender': [
           { count: 10, key: 'female' },
           { count: 25, key: 'male' },
         ],
-      },
+        'demographic.race': [{ key: '_missing', count: 35 }],
+      }),
+    ).toEqual({
+      'demographic.gender': [
+        { count: 10, key: 'female' },
+        { count: 25, key: 'male' },
+      ],
     });
   });
 
@@ -35,20 +31,24 @@ describe('filterUsefulFacets', () => {
     expect(
       filterUsefulFacets({
         'exposures.height': {
-          stats: {
-            count: 0,
-            min: null as unknown as number,
-            max: null as unknown as number,
-            sum: 0,
-          },
+          count: 0,
+          min: null as unknown as number,
+          max: null as unknown as number,
+          sum: 0,
         },
         'exposures.years_smoked': {
-          stats: { count: 947, min: 0, max: 68, sum: 32170 },
+          count: 947,
+          min: 0,
+          max: 68,
+          sum: 32170,
         },
       }),
     ).toEqual({
       'exposures.years_smoked': {
-        stats: { count: 947, min: 0, max: 68, sum: 32170 },
+        count: 947,
+        min: 0,
+        max: 68,
+        sum: 32170,
       },
     });
   });

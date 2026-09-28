@@ -55,7 +55,7 @@ describe('middleware', () => {
   });
 
   afterEach(() => {
-    if (originalNodeEnv === undefined) delete process.env.NODE_ENV;
+    if (originalNodeEnv === undefined) Reflect.deleteProperty(process.env, 'NODE_ENV');
     else Object.assign(process.env, { NODE_ENV: originalNodeEnv });
   });
 
