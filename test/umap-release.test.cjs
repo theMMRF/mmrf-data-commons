@@ -83,7 +83,6 @@ test('UMAP retains CGS match-all filters and demo behavior', () => {
 
 const sections = [{ title: 'Analysis', tools: [
   { appId: 'Umap', title: 'Bulk RNA-seq UMAP' }, { appId: 'OncoMatrix', title: 'OncoMatrix' },
-  { appId: 'SC', title: 'Single Cell RNA-seq' },
 ] }];
 let route = {};
 const page = loadTs('src/pages/index.tsx', {
@@ -110,7 +109,7 @@ function findElement(tree, type) {
   }
 }
 
-test('UMAP and single-cell cards are hidden only on prod; direct URLs remain available', async () => {
+test('UMAP card is hidden only on prod and its direct URL remains available', async () => {
   for (const headers of [
     { host: 'virtuallab.themmrf.org' },
     { host: 'internal', 'x-forwarded-host': 'virtuallab.themmrf.org' },
@@ -121,11 +120,9 @@ test('UMAP and single-cell cards are hidden only on prod; direct URLs remain ava
     assert.equal(props.hideProdOnlyTools, prod);
     route = {};
     const cards = findElement(page.default(props), 'tool-sections').props.sections[0].tools;
-    assert.deepEqual(cards.map(t => t.appId), prod ? ['OncoMatrix'] : ['Umap', 'OncoMatrix', 'SC']);
-    for (const app of ['Umap', 'SC']) {
-      route = { app };
-      assert.equal(findElement(page.default(props), 'workspace').props.appInfo.appId, app);
-    }
+    assert.deepEqual(cards.map(t => t.appId), prod ? ['OncoMatrix'] : ['Umap', 'OncoMatrix']);
+    route = { app: 'Umap' };
+    assert.equal(findElement(page.default(props), 'workspace').props.appInfo.appId, 'Umap');
   }
-  assert.equal(sections[0].tools.length, 3, 'visibility filtering must not mutate app registration');
+  assert.equal(sections[0].tools.length, 2, 'visibility filtering must not mutate app registration');
 });

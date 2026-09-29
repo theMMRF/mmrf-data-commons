@@ -29,8 +29,8 @@ import { useProjectId } from '@/hooks/useAppFilters';
 import { formatGeneSymbol } from '@/utils/formatQueryExpressionValues';
 
 const PROD_HOSTNAME = 'virtuallab.themmrf.org';
-// Hold back these cards in production; keep dev and direct URL access available.
-const PROD_HIDDEN_APP_IDS = new Set<string>(['Umap', 'SC']);
+// Hold back the card in production; keep dev and direct URL access available.
+const PROD_HIDDEN_APP_IDS = new Set<string>(['Umap']);
 
 interface CountsPanelProps {
   index: string;
