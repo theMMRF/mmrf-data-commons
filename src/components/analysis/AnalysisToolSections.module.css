@@ -9,3 +9,10 @@
 .toolSections :global(.mantine-Grid-inner) > :global(.mantine-Grid-col):not(:last-child) {
   padding: calc(var(--mantine-spacing-md) / 2);
 }
+
+/* Gen3 sizes each core card at a quarter of the row (gap-4 between cards).
+   With three core tools beside the What's new column, a third fills the row
+   without squeezing the card text. */
+.toolSections :global(.flex-wrap) > :global(.w-1\/4) {
+  width: calc((100% - 2rem) / 3);
+}
