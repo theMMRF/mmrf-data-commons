@@ -34,7 +34,7 @@ const ToolLink = ({ tool }: { tool: AnalysisToolConfiguration }) => (
   <li>
     <Link
       href={{ pathname: '/', query: { app: tool.appId } }}
-      className="group inline-flex items-center gap-1.5 rounded border border-secondary-darkest bg-base-max py-0.5 pl-1 pr-2 font-heading text-[11px] font-bold leading-5 text-secondary no-underline transition-colors hover:border-primary hover:bg-base-lightest focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      className="group inline-flex items-center gap-1.5 rounded border border-secondary-darkest bg-base-max py-1 pl-1.5 pr-2.5 font-heading text-[13px] font-bold leading-5 text-secondary no-underline transition-colors hover:border-primary hover:bg-base-lightest focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
       {typeof tool.icon === 'string' ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -42,10 +42,10 @@ const ToolLink = ({ tool }: { tool: AnalysisToolConfiguration }) => (
           src={withClientBasePath(tool.icon)}
           alt=""
           aria-hidden="true"
-          className="h-4 w-4 object-contain"
+          className="h-5 w-5 object-contain"
         />
       ) : (
-        <span aria-hidden="true" className="flex h-4 w-4 items-center justify-center">
+        <span aria-hidden="true" className="flex h-5 w-5 items-center justify-center">
           {tool.icon}
         </span>
       )}
@@ -69,40 +69,40 @@ const ReleaseEntry = ({
   const titleId = `whats-new-${release.id}`;
 
   return (
-    <li className="group/release relative pb-6 pl-5 last:pb-0">
+    <li className="group/release relative pb-8 pl-6 last:pb-0">
       <span
         aria-hidden="true"
-        className="absolute bottom-0 left-[4.5px] top-3 w-px bg-base-lighter group-last/release:hidden"
+        className="absolute bottom-0 left-[5.5px] top-4 w-px bg-base-lighter group-last/release:hidden"
       />
       <span
         aria-hidden="true"
-        className={`absolute left-0 top-[5px] h-[10px] w-[10px] rounded-full border-2 ${
+        className={`absolute left-0 top-[6px] h-3 w-3 rounded-full border-2 ${
           isNew
             ? 'border-accent bg-accent'
             : 'border-secondary-darkest bg-base-max'
         }`}
       />
       <article aria-labelledby={titleId}>
-        <p className="flex items-center gap-2 font-heading text-[11px] font-bold uppercase leading-5 tracking-[0.08em] text-secondary">
+        <p className="flex items-center gap-2 font-heading text-[13px] font-bold uppercase leading-6 tracking-[0.08em] text-secondary">
           <time dateTime={release.date} className="tabular-nums">
             {formatReleaseDate(release.date)}
           </time>
           {isNew && (
-            <span className="rounded-sm bg-accent-lightest px-1.5 text-[10px] tracking-[0.1em]">
+            <span className="rounded-sm bg-accent-lightest px-1.5 text-[11px] leading-5 tracking-[0.1em]">
               New
             </span>
           )}
         </p>
         <h3
           id={titleId}
-          className="mt-0.5 font-heading text-[15px] font-bold leading-snug text-black"
+          className="mt-0.5 font-heading text-lg font-bold leading-snug text-black"
         >
           {release.title}
         </h3>
-        <p className="font-content text-[11px] leading-5 text-base-darkest">
+        <p className="font-content text-[13px] leading-6 text-base-darkest">
           {sourceLabel(release)}
         </p>
-        <ul className="mt-2 list-disc space-y-1 pl-4 font-content text-xs leading-5 text-black marker:text-accent">
+        <ul className="mt-2 list-disc space-y-1 pl-5 font-content text-sm leading-6 text-black marker:text-accent">
           {release.changes.map((change) => (
             <li key={change}>{change}</li>
           ))}
@@ -110,7 +110,7 @@ const ReleaseEntry = ({
         {tools.length > 0 && (
           <ul
             aria-label={`Tools in “${release.title}”`}
-            className="mt-3 flex flex-wrap gap-1.5"
+            className="mt-3 flex flex-wrap gap-2"
           >
             {tools.map((tool) => (
               <ToolLink key={tool.appId} tool={tool} />
@@ -155,10 +155,7 @@ export default function WhatsNew({
       >
         What&rsquo;s new
       </h2>
-      <div aria-hidden="true" className="mb-4 w-[70px] border-t-4 border-accent" />
-      <p className="mb-5 text-xs leading-5 text-base-darkest">
-        Changes to Virtual Lab and its ProteinPaint tools, newest first.
-      </p>
+      <div aria-hidden="true" className="mb-5 w-[70px] border-t-4 border-accent" />
       <ol id={listId}>
         {shown.map((release) => (
           <ReleaseEntry
@@ -178,7 +175,7 @@ export default function WhatsNew({
           aria-expanded={showAll}
           aria-controls={listId}
           onClick={() => setShowAll((value) => !value)}
-          className="mt-5 ml-5 font-heading text-xs font-bold text-primary underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="mt-6 ml-6 font-heading text-sm font-bold text-primary underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           {showAll
             ? 'Show fewer updates'

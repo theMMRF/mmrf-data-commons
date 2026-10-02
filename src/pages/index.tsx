@@ -174,14 +174,14 @@ const Tools = ({
           {appInfo ? (
             <AnalysisWorkspace appInfo={appInfo} />
           ) : visibleSections ? (
-            <div className="mx-4 mb-6 flex flex-col gap-10 xl:flex-row xl:items-start xl:gap-4">
+            <div className="mx-4 mb-6 flex max-w-[1880px] flex-col gap-10 xl:flex-row xl:items-start xl:gap-8">
               <div className="min-w-0 xl:flex-1">
                 <AnalysisToolSections
                   sections={visibleSections}
                   classNames={classNames}
                 />
               </div>
-              <div className="max-w-xl xl:w-[284px] xl:max-w-none xl:shrink-0">
+              <div className="max-w-2xl xl:w-[clamp(400px,34%,540px)] xl:max-w-none xl:shrink-0">
                 <WhatsNew tools={visibleTools} />
               </div>
             </div>

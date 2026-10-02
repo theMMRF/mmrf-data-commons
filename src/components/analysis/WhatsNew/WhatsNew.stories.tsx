@@ -27,19 +27,21 @@ const meta = {
     window.localStorage.removeItem(LAST_SEEN_STORAGE_KEY);
     window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
   },
-  decorators: [
-    (Story) => (
-      <div style={{ width: 284 }}>
-        <Story />
-      </div>
-    ),
-  ],
 } satisfies Meta<typeof WhatsNew>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const columnWidth: Story['decorators'] = [
+  (Story) => (
+    <div style={{ width: 460 }}>
+      <Story />
+    </div>
+  ),
+];
+
 export const Default: Story = {
+  decorators: columnWidth,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const [newest] = RELEASES;
@@ -77,6 +79,7 @@ export const Default: Story = {
 };
 
 export const HiddenToolsAreNotLinked: Story = {
+  decorators: columnWidth,
   args: { tools: tools.filter((tool) => tool.appId !== 'DE') },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -90,14 +93,16 @@ export const HiddenToolsAreNotLinked: Story = {
   },
 };
 
+/** Same layout as the Analysis Center page; resize the viewport to compare. */
 export const InAnalysisCenter: Story = {
+  parameters: { layout: 'fullscreen' },
   decorators: [
     () => (
-      <div style={{ width: 1400 }} className="flex items-start gap-4 px-4">
-        <div className="min-w-0 flex-1">
+      <div className="mx-4 mb-6 flex max-w-[1880px] flex-col gap-10 xl:flex-row xl:items-start xl:gap-8">
+        <div className="min-w-0 xl:flex-1">
           <AnalysisToolSections sections={sections} />
         </div>
-        <div className="w-[284px] shrink-0">
+        <div className="max-w-2xl xl:w-[clamp(400px,34%,540px)] xl:max-w-none xl:shrink-0">
           <WhatsNew tools={tools} />
         </div>
       </div>
