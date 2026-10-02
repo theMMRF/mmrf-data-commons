@@ -22,6 +22,7 @@ import {
 import { Text} from "@mantine/core";
 import AnalysisWorkspace from '@/components/analysis/AnalysisWorkspace';
 import AnalysisToolSections from '@/components/analysis/AnalysisToolSections';
+import WhatsNew from '@/components/analysis/WhatsNew';
 import AdditionalCohortSelection from '@/features/cohortComparison/AdditionalCohortSelection';
 import { useDeepCompareEffect } from 'use-deep-compare';
 import { getCustomCohortButtons } from '@/features/cohort/getCustomCohortButtons';
@@ -105,6 +106,10 @@ const Tools = ({
       }))
       .filter((section) => section.tools.length > 0);
   }, [hideProdOnlyTools, sections]);
+  const visibleTools = useMemo(
+    () => (visibleSections ?? []).flatMap((section) => section.tools),
+    [visibleSections],
+  );
   const REGISTERED_APPS = useMemo(() => {
     if (sections) {
       return sections.reduce(
@@ -169,11 +174,16 @@ const Tools = ({
           {appInfo ? (
             <AnalysisWorkspace appInfo={appInfo} />
           ) : visibleSections ? (
-            <div className="mx-4 mb-6 pr-[300px]">
-              <AnalysisToolSections
-                sections={visibleSections}
-                classNames={classNames}
-              />
+            <div className="mx-4 mb-6 flex flex-col gap-10 xl:flex-row xl:items-start xl:gap-4">
+              <div className="min-w-0 xl:flex-1">
+                <AnalysisToolSections
+                  sections={visibleSections}
+                  classNames={classNames}
+                />
+              </div>
+              <div className="max-w-xl xl:w-[284px] xl:max-w-none xl:shrink-0">
+                <WhatsNew tools={visibleTools} />
+              </div>
             </div>
           ) : (
             <div className="mt-20">No sections found in config file</div>
