@@ -37,6 +37,10 @@ const nextConfig = {
   productionBrowserSourceMaps: true,
   pageExtensions: ['mdx', 'md', 'jsx', 'js', 'tsx', 'ts'],
   basePath,
+  // Gen3 services register some routes with a trailing slash (for example
+  // /analysis/v0/survival/). Without this, next dev strips the slash with a
+  // 308 before the rewrites below proxy the request.
+  skipTrailingSlashRedirect: isDev,
   experimental: {
     esmExternals: true,
   },
@@ -54,9 +58,7 @@ const nextConfig = {
     if (isDev) {
       const GEN3_TARGET =
         process.env.NEXT_PUBLIC_GEN3_API_TARGET || 'https://localhost';
-      return [
-        ...termsApiRewrites,
-        { source: '/protein-paint/:path*', destination: '/api/protein-paint/:path*' },
+      const gen3Rewrites = [
         { source: '/_status', destination: `${GEN3_TARGET}/_status` },
         { source: '/user/:path*', destination: `${GEN3_TARGET}/user/:path*` },
         {
@@ -102,6 +104,16 @@ const nextConfig = {
           source: '/analysis/v0/:path*',
           destination: `${GEN3_TARGET}/analysis/v0/:path*`,
         },
+      ];
+      return [
+        ...termsApiRewrites,
+        { source: '/protein-paint/:path*', destination: '/api/protein-paint/:path*' },
+        // Rewrite sources match strictly, so forward slash-terminated paths
+        // with their slash, as the production gateway does.
+        ...gen3Rewrites.flatMap((rewrite) => [
+          { source: `${rewrite.source}/`, destination: `${rewrite.destination}/` },
+          rewrite,
+        ]),
       ];
     } else {
       return termsApiRewrites;
