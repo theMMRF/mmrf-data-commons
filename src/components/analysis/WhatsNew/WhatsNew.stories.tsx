@@ -5,7 +5,10 @@ import type { AnalysisToolConfiguration } from '@gen3/frontend';
 import WhatsNew from './WhatsNew';
 import AnalysisToolSections from '../AnalysisToolSections';
 import { RELEASES } from './releases';
-import { LAST_SEEN_STORAGE_KEY } from './useUnseenReleaseIds';
+import {
+  LAST_SEEN_STORAGE_KEY,
+  SESSION_STORAGE_KEY,
+} from './useUnseenReleaseIds';
 import config from '../../../../config/gen3/analysisTools.json';
 
 const sections = config.sections.map((section) => ({
@@ -22,6 +25,7 @@ const meta = {
   args: { tools },
   beforeEach: () => {
     window.localStorage.removeItem(LAST_SEEN_STORAGE_KEY);
+    window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
   },
   decorators: [
     (Story) => (
