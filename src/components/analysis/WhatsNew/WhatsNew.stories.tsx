@@ -98,7 +98,7 @@ export const InAnalysisCenter: Story = {
   parameters: { layout: 'fullscreen' },
   decorators: [
     () => (
-      <div className="mx-4 mb-6 flex max-w-[1880px] flex-col gap-10 xl:flex-row xl:items-start xl:gap-8">
+      <div className="mx-auto mb-6 flex w-full max-w-[1912px] flex-col gap-10 px-4 xl:flex-row xl:items-start xl:gap-12">
         <div className="min-w-0 xl:flex-1">
           <AnalysisToolSections sections={sections} />
         </div>
