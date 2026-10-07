@@ -1,5 +1,13 @@
-name: CI
-on: push
+name: Pull request checks
+on: pull_request
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   interaction-and-accessibility:
     runs-on: ubuntu-latest
@@ -21,7 +29,7 @@ jobs:
           npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
             "npx http-server storybook-static --port 6006 --verbose" \
             "npx wait-on tcp:6006 && yarn test-storybook"
-  build:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
