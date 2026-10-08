@@ -7,7 +7,7 @@ import config from '../../../config/gen3/analysisTools.json';
 const meta = {
   component: AnalysisToolSections,
   title: 'components/analysis/AnalysisToolSections',
-  decorators: [(Story) => <div style={{ width: 1400 }}><Story /></div>],
+  decorators: [(Story) => <div style={{ width: 900 }}><Story /></div>],
 } satisfies Meta<typeof AnalysisToolSections>;
 
 export default meta;

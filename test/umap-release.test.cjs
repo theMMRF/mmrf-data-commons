@@ -95,6 +95,7 @@ const page = loadTs('src/pages/index.tsx', {
   '@gen3/core': {}, '@mantine/core': {},
   '@/components/analysis/AnalysisWorkspace': { __esModule: true, default: 'workspace' },
   '@/components/analysis/AnalysisToolSections': { __esModule: true, default: 'tool-sections' },
+  '@/components/analysis/WhatsNew': { __esModule: true, default: 'whats-new' },
   '@/features/cohortComparison/AdditionalCohortSelection': {},
   'use-deep-compare': {}, '@/features/cohort/getCustomCohortButtons': { getCustomCohortButtons: () => [] },
   '@/hooks/useAppFilters': { useProjectId: () => undefined },
@@ -120,8 +121,11 @@ test('UMAP and single-cell cards are hidden only on prod; direct URLs remain ava
     const prod = (headers['x-forwarded-host'] || headers.host) === 'virtuallab.themmrf.org';
     assert.equal(props.hideProdOnlyTools, prod);
     route = {};
-    const cards = findElement(page.default(props), 'tool-sections').props.sections[0].tools;
+    const landing = page.default(props);
+    const cards = findElement(landing, 'tool-sections').props.sections[0].tools;
     assert.deepEqual(cards.map(t => t.appId), prod ? ['OncoMatrix'] : ['Umap', 'OncoMatrix', 'SC']);
+    assert.deepEqual(findElement(landing, 'whats-new').props.tools, cards,
+      'release notes must link only to cards visible on this host');
     for (const app of ['Umap', 'SC']) {
       route = { app };
       assert.equal(findElement(page.default(props), 'workspace').props.appInfo.appId, app);
