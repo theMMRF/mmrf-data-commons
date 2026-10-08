@@ -87,6 +87,7 @@ const CardControls: React.FC<CardControlsProps> = ({
           <div className="order-2 md:order-1">
             <CasesCohortButtonFromFilters
               filters={selectedFacets.length === 0 ? undefined : filters}
+              asFilterRepresentation
               numCases={
                 selectedFacets.length === 0
                   ? 0
