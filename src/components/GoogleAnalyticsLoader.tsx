@@ -37,8 +37,6 @@ const GoogleAnalyticsLoader = ({
   const measurementId = gaMeasurementId?.trim();
   const loginStatus = useCoreSelector(selectUserAuthStatus);
   const user = useCoreSelector(selectUserDetails);
-  const identityPending =
-    loginStatus === 'pending' || loginStatus === 'not present';
   // Fence account IDs are stable across devices. Never fall back to an email,
   // username, token subject, or other potentially identifying profile field.
   const accountId = user.user_id ?? user.id;
@@ -49,12 +47,14 @@ const GoogleAnalyticsLoader = ({
     accountId > 0
       ? `fence-${accountId}`
       : null;
+  const trackingAllowed = enabled && userId !== null;
 
   useEffect(() => {
     if (!measurementId) return;
 
-    if (!enabled) {
+    if (!trackingAllowed) {
       // Unmounting a Script does not stop a Google tag that has already loaded.
+      // Also stop collection during unresolved/expired sessions or invalid IDs.
       window[`ga-disable-${measurementId}`] = true;
       if (window.__mmrfGaUserId) {
         window.gtag?.('set', { user_id: null });
@@ -62,11 +62,6 @@ const GoogleAnalyticsLoader = ({
       }
       return;
     }
-
-    // Wait for the existing SessionProvider to resolve the initial identity so
-    // the first page view for a signed-in visitor already has their User-ID.
-    // A background session refresh should not temporarily remove a known ID.
-    if (identityPending) return;
 
     window[`ga-disable-${measurementId}`] = false;
     window.dataLayer = window.dataLayer || [];
@@ -91,18 +86,18 @@ const GoogleAnalyticsLoader = ({
       window.gtag('set', { user_id: userId });
       window.__mmrfGaUserId = userId;
     }
-  }, [enabled, measurementId, identityPending, userId]);
+  }, [trackingAllowed, measurementId, userId]);
 
   useEffect(() => {
-    if (!enabled || measurementId) return;
+    if (!trackingAllowed || measurementId) return;
     if (typeof window === 'undefined' || window.__mmrfGaPlaceholderLogged)
       return;
 
     console.log(GA_PLACEHOLDER_LOG_MESSAGE);
     window.__mmrfGaPlaceholderLogged = true;
-  }, [enabled, measurementId]);
+  }, [trackingAllowed, measurementId]);
 
-  if (!enabled || !measurementId || identityPending) return null;
+  if (!trackingAllowed || !measurementId) return null;
 
   return (
     <Script

@@ -80,23 +80,20 @@ test('waits for login resolution and sets the account ID before the first page v
   );
 });
 
-test('tracks public visitors anonymously, then updates login, account switch, and logout without extra page views', () => {
+test('does not track public visitors, then tracks login and account switches and stops on logout', () => {
   const view = render(loader());
+  expect(commands()).toEqual([]);
+  expect(screen.queryByTestId('google-tag')).not.toBeInTheDocument();
+  expect(window[`ga-disable-${measurementId}`]).toBe(true);
+
+  setIdentity('authenticated', { user_id: 42 });
+  view.rerender(loader());
   expect(commands()).toEqual([
     ['js', expect.any(Date)],
+    ['set', { user_id: 'fence-42' }],
     ['config', measurementId],
   ]);
-
-  setIdentity('authenticated', { user_id: 42 });
-  view.rerender(loader());
-  expect(commands().at(-1)).toEqual(['set', { user_id: 'fence-42' }]);
-
-  setIdentity('pending', { user_id: 42 });
-  view.rerender(loader());
-  expect(commands()).toHaveLength(3);
-  setIdentity('authenticated', { user_id: 42 });
-  view.rerender(loader());
-  expect(commands()).toHaveLength(3);
+  expect(window[`ga-disable-${measurementId}`]).toBe(false);
 
   setIdentity('authenticated', { user_id: 57 });
   view.rerender(loader());
@@ -106,9 +103,51 @@ test('tracks public visitors anonymously, then updates login, account switch, an
   setIdentity('unauthenticated', { user_id: 57 });
   view.rerender(loader());
   expect(commands().at(-1)).toEqual(['set', { user_id: null }]);
+  expect(window[`ga-disable-${measurementId}`]).toBe(true);
+  expect(window.__mmrfGaUserId).toBeNull();
+  expect(screen.queryByTestId('google-tag')).not.toBeInTheDocument();
+
+  // A later login restores identified collection without reinitializing the tag.
+  setIdentity('authenticated', { user_id: 42 });
+  view.rerender(loader());
+  expect(window[`ga-disable-${measurementId}`]).toBe(false);
+  expect(commands().at(-1)).toEqual(['set', { user_id: 'fence-42' }]);
   expect(commands().filter(([command]) => command === 'config')).toHaveLength(
     1,
   );
+});
+
+test.each<LoginStatus>(['pending', 'not present', 'unauthenticated'])(
+  'disables a loaded tag when authentication becomes %s despite a cached profile',
+  (status) => {
+    setIdentity('authenticated', { user_id: 42 });
+    const view = render(loader());
+    setIdentity(status, { user_id: 42 });
+    view.rerender(loader());
+    expect(window[`ga-disable-${measurementId}`]).toBe(true);
+    expect(commands().at(-1)).toEqual(['set', { user_id: null }]);
+    expect(screen.queryByTestId('google-tag')).not.toBeInTheDocument();
+
+    setIdentity('authenticated', { user_id: 42 });
+    view.rerender(loader());
+    expect(window[`ga-disable-${measurementId}`]).toBe(false);
+    expect(commands().at(-1)).toEqual(['set', { user_id: 'fence-42' }]);
+    expect(commands().filter(([command]) => command === 'config')).toHaveLength(
+      1,
+    );
+  },
+);
+
+test('disables collection before clearing the identity in an already loaded tag', () => {
+  setIdentity('authenticated', { user_id: 42 });
+  const view = render(loader());
+  const set = jest.fn(() => {
+    expect(window[`ga-disable-${measurementId}`]).toBe(true);
+  });
+  window.gtag = set;
+  setIdentity('unauthenticated');
+  view.rerender(loader());
+  expect(set).toHaveBeenCalledWith('set', { user_id: null });
 });
 
 test('uses the same account ID across fresh browser contexts and supports Fence id', () => {
@@ -135,12 +174,21 @@ test.each([undefined, 0, -1, 1.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1])(
       sub: 'researcher@example.org',
     });
     render(loader());
-    expect(commands()).toEqual([
-      ['js', expect.any(Date)],
-      ['config', measurementId],
-    ]);
+    expect(commands()).toEqual([]);
+    expect(window[`ga-disable-${measurementId}`]).toBe(true);
+    expect(screen.queryByTestId('google-tag')).not.toBeInTheDocument();
   },
 );
+
+test('stops an already loaded tag if an authenticated profile loses its account ID', () => {
+  setIdentity('authenticated', { user_id: 42 });
+  const view = render(loader());
+  setIdentity('authenticated', { email: 'researcher@example.org' });
+  view.rerender(loader());
+  expect(window[`ga-disable-${measurementId}`]).toBe(true);
+  expect(commands().at(-1)).toEqual(['set', { user_id: null }]);
+  expect(screen.queryByTestId('google-tag')).not.toBeInTheDocument();
+});
 
 test('does not duplicate initialization on StrictMode effects or a component remount', () => {
   setIdentity('authenticated', { user_id: 42 });
@@ -169,7 +217,10 @@ test('disables an already loaded tag and clears identity when consent is withdra
 
 test('keeps the no-measurement-ID placeholder without loading Analytics', () => {
   const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
-  render(<GoogleAnalyticsLoader enabled />);
+  const view = render(<GoogleAnalyticsLoader enabled />);
+  expect(log).not.toHaveBeenCalled();
+  setIdentity('authenticated', { user_id: 42 });
+  view.rerender(<GoogleAnalyticsLoader enabled />);
   expect(log).toHaveBeenCalledWith(GA_PLACEHOLDER_LOG_MESSAGE);
   expect(screen.queryByTestId('google-tag')).not.toBeInTheDocument();
   expect(commands()).toEqual([]);
