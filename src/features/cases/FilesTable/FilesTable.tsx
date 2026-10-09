@@ -15,7 +15,7 @@ import {
   createColumnHelper,
 } from '@tanstack/react-table';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDeepCompareMemo } from 'use-deep-compare';
 import { downloadTSV } from '@/components/Table/utils';
 import { getFormattedTimestamp } from '@/utils/date';
@@ -30,10 +30,6 @@ const currentCart = null;
 
 interface FilesTableProps {
   tableData: CaseFilesTableDataType[];
-  displayedDataAfterSearch: CaseFilesTableDataType[];
-  setDisplayedDataAfterSearch: React.Dispatch<
-    React.SetStateAction<CaseFilesTableDataType[]>
-  >;
   isFetching: boolean;
   isSuccess: boolean;
   isError: boolean;
@@ -59,8 +55,6 @@ const fileSize = (input: number) => {
 
 const FilesTable = ({
   tableData,
-  displayedDataAfterSearch,
-  setDisplayedDataAfterSearch,
   isFetching,
   isSuccess,
   isError,
@@ -70,6 +64,10 @@ const FilesTable = ({
   // const modal = useCoreSelector((state) => selectCurrentModal(state));
   const [searchTerm, setSearchTerm] = useState('');
   const [sorting, setSorting] = useState<ColumnSort[]>([]);
+  const displayedDataAfterSearch = useMemo(
+    () => searchTerm ? FilesTableClientSideSearch(tableData, searchTerm) : tableData,
+    [tableData, searchTerm],
+  );
 
   const caseFilesTableDefaultColumns = useDeepCompareMemo<
     ColumnDef<CaseFilesTableDataType>[]
@@ -86,7 +84,7 @@ const FilesTable = ({
         header: 'File Name',
         cell: ({ row }) => (
           <Link
-            href={`/files/${row.original.file_uuid}`}
+            href={`/files/${encodeURIComponent(row.original.file_uuid)}`}
             className="underline text-primary"
           >
             {row.original.file_name}
@@ -99,7 +97,7 @@ const FilesTable = ({
         header: 'File GUID',
         cell: ({ row }) => (
           <Link
-            href={`/files/${row.original.file_uuid}`}
+            href={`/files/${encodeURIComponent(row.original.file_uuid)}`}
             className="underline text-primary"
           >
             {row.original.file_uuid}
@@ -179,16 +177,6 @@ const FilesTable = ({
     () => handleSortByChange(sorting as SortingState),
     [sorting, handleSortByChange],
   );
-  useEffect(() => {
-    if (searchTerm.length > 0) {
-      setDisplayedDataAfterSearch(
-        FilesTableClientSideSearch(tableData, searchTerm),
-      );
-    } else {
-      setDisplayedDataAfterSearch(tableData);
-    }
-  }, [searchTerm, tableData]);
-
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
     caseFilesTableDefaultColumns.map((column) => column.id as string), //must start out with populated columnOrder so we can splice
   );
@@ -277,7 +265,7 @@ const FilesTable = ({
           size,
           from,
           total,
-          label: 'somatic mutation',
+          label: 'file',
         }}
         search={{
           enabled: true,
