@@ -1,3 +1,4 @@
+/** @jest-config-loader ts-node */
 import type { JestConfigWithTsJest } from 'ts-jest';
 
 const jestConfig: JestConfigWithTsJest = {
