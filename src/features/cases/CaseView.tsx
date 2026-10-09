@@ -368,7 +368,7 @@ export const CaseView: React.FC<CaseViewProps> = ({
           className={`mt-8 ${isModal ? 'scroll-mt-36' : 'scroll-mt-72'}`}
           id="files"
         >
-          <FilesTableContainer caseId={case_id} />
+          <FilesTableContainer key={case_id} files={data.files ?? []} />
         </div>
 
         <div className={`mt-8 mb-16`}>
