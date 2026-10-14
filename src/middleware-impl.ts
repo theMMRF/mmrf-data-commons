@@ -26,7 +26,12 @@ const DEVELOPMENT_DATA_PROXY_PATHS = [
 ];
 
 function getRouteRuleForPath(pathname: string, routeConfig: RouteConfig) {
-  return routeConfig?.[pathname] ?? routeConfig?.[WILDCARD_ROUTE_KEY];
+  // Study permalinks are the same Discovery page and must inherit its access
+  // policy instead of falling through to the public wildcard route.
+  const discoveryRule = pathname.startsWith('/Discovery/')
+    ? routeConfig?.['/Discovery']
+    : undefined;
+  return routeConfig?.[pathname] ?? discoveryRule ?? routeConfig?.[WILDCARD_ROUTE_KEY];
 }
 
 function isLoggedIn(loginStatus: LoginStatus) {

@@ -81,6 +81,7 @@ describe('middleware', () => {
   it.each([
     '/',
     '/DataLibrary',
+    '/Discovery/s41588-024-01853-0',
     '/protein-paint-other',
     '/api/protein-paint-other',
     '/analysis/v01',
@@ -111,6 +112,41 @@ describe('middleware', () => {
     expect(new URL(response.headers.get('location')!).pathname).toBe(
       '/TermsAcceptance',
     );
+  });
+
+  it('requires login for study permalinks when Discovery requires login', async () => {
+    mockedGetRouteConfig.mockResolvedValue({
+      routes: {
+        '/Discovery': { loginRequired: true },
+        '*': { loginRequired: false },
+      },
+    });
+    mockedGetLoginStatus.mockResolvedValue({ status: 'not present' });
+
+    const response = await middleware(request('/Discovery/s41588-024-01853-0'));
+
+    expect(response.headers.get('location')).toBe(
+      'https://virtuallab.themmrf.org/Login?referer=%2FDiscovery%2Fs41588-024-01853-0',
+    );
+  });
+
+  it('inherits Discovery authorization requirements for study permalinks', async () => {
+    mockedGetRouteConfig.mockResolvedValue({
+      routes: {
+        '/Discovery': { loginRequired: true, authz: ['/programs/MMRF'] },
+        '*': { loginRequired: false },
+      },
+    });
+    mockedGetLoginStatus.mockResolvedValue({ status: 'issued' });
+    mockedFetchTermsAcceptedFromBff.mockResolvedValue({
+      isLoggedIn: true,
+      hasAcceptedLatestTerms: true,
+    });
+    jest.mocked(fetchArboristResources).mockResolvedValue([]);
+
+    const response = await middleware(request('/Discovery/s41588-024-01853-0'));
+
+    expect(new URL(response.headers.get('location')!).pathname).toBe('/403');
   });
 
   it('redirects unauthenticated root requests to the redesigned login landing page', async () => {
