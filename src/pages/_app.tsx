@@ -7,13 +7,10 @@ import mantinetheme from "../mantineTheme";
 
 import {
   Gen3Provider,
-  type ModalsConfig,
   registerCohortBuilderDefaultPreviewRenderers,
-  RegisteredIcons,
   registerExplorerDefaultCellRenderers,
   registerMetadataSchemaApp,
   registerDiscoveryDefaultCellRenderers,
-  SessionConfiguration,
 } from "@gen3/frontend";
 
 import { registerCohortTableCustomCellRenderers } from "@/lib/CohortBuilder/CustomCellRenderers";
@@ -28,7 +25,7 @@ import "@fontsource/noto-sans";
 
 import { setDRSHostnames } from "@gen3/core";
 import drsHostnames from "../../config/drsHostnames.json";
-import { loadContent } from "@/lib/content/loadContent";
+import { loadAppConfig, type AppConfig } from "@/lib/content/loadAppConfig";
 import Loading from "../components/Loading";
 import { registerCohortComparisonApp } from "@/features/cohortComparison/registerApp";
 import { registerGenesAndMutationFrequencyAnalysisTool } from "@/features/genomic/registerApp";
@@ -44,7 +41,6 @@ import {
   type CookieConsentState,
 } from "@/lib/cookieConsent";
 import {
-  type AuthorizedRoutesConfig,
   DefaultAuthorizedRoutesConfig,
 } from '@gen3/frontend';
 
@@ -56,12 +52,7 @@ if (typeof window !== "undefined" && process.env.NODE_ENV !== "production") {
   axe(React, ReactDOM, 1000);
 }
 
-interface Gen3AppProps {
-  icons: Array<RegisteredIcons>;
-  modalsConfig: ModalsConfig;
-  sessionConfig: SessionConfiguration;
-  protectedRoutes: AuthorizedRoutesConfig;
-}
+type Gen3AppProps = AppConfig;
 
 const Gen3App = ({
   Component,
@@ -155,7 +146,7 @@ Gen3App.getInitialProps = async (
   const ctx = await App.getInitialProps(context);
 
   try {
-    const res = await loadContent();
+    const res = await loadAppConfig();
     return {
       ...ctx,
       ...res,
@@ -175,7 +166,7 @@ Gen3App.getInitialProps = async (
         height: 0,
       },
     ],
-    modalsConfig: {},
+    modalsConfig: { systemUseModal: { enabled: false, content: { text: [] } } },
     sessionConfig: {},
     protectedRoutes: DefaultAuthorizedRoutesConfig,
   };

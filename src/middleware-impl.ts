@@ -47,7 +47,11 @@ function getRouteRuleForPath(pathname: string, routeConfig: RouteConfig) {
     }
   }
 
-  return routeConfig?.[WILDCARD_ROUTE_KEY];
+  // Study permalinks share Discovery's policy even without a separate rule.
+  const discoveryRule = pathname.startsWith('/Discovery/')
+    ? routeConfig?.['/Discovery']
+    : undefined;
+  return discoveryRule ?? routeConfig?.[WILDCARD_ROUTE_KEY];
 }
 
 function isLoggedIn(loginStatus: LoginStatus) {

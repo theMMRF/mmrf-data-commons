@@ -62,7 +62,7 @@ const renameStudyDescriptionField = <
   fieldConfig: T,
 ): T =>
   fieldConfig?.field === ABSTRACT_FIELD_NAME
-    ? ({ ...fieldConfig, name: ABSTRACT_LABEL } as T)
+    ? ({ ...fieldConfig, name: ABSTRACT_LABEL, label: ABSTRACT_LABEL } as T)
     : fieldConfig;
 
 const patchDiscoveryIndexLabels = (
