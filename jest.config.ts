@@ -8,6 +8,7 @@ const jestConfig: JestConfigWithTsJest = {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@/components(.*)$': '<rootDir>/src/components/$1',
     '^@/lib/(.*)$': '<rootDir>/src/lib/$1',
+    '^@/(.*)$': '<rootDir>/src/$1',
     '^redux-persist/lib/storage/createWebStorage$':
       '<rootDir>/__mocks__/createWebStorageMock.js',
   },

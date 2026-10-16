@@ -1,9 +1,13 @@
-## Switching to Chorts Filters When Creating Cohorts
-Currently, when a cohort is created, the case_ids are used to to represet the cohort, instead of the cohort filters.
+## Saving Cohorts as Filters
 
-To change this, you will need to refactor: `src/features/cases/CasesCohortButton/CasesCohortButton.tsx`
-and look at the code used to create the cohort.
-There is a `asFilterRepresentation` prioperty that you can use to create a cohort usign the filters and not the case_ids.
-Note that is only possible with `Only Selected Cases` option.
+When a tool already has a case-centric `FilterSet`, it can save that filter
+directly instead of resolving the matching cases to a static list of case IDs.
+This preserves the selection criteria in the cohort bar.
 
-This can be setto true in `src/features/cDave/CDaveCard/CardControls.tsx`
+Use the `asFilterRepresentation` property on
+`CasesCohortButtonFromFilters` or `CohortCreationButton`. The Clinical Data
+Analysis cards and Cohort Comparison facet tables use this behavior.
+
+Do not enable it for selections that are only available as case IDs or that
+must be resolved across genomic indexes. Those cohorts should remain static
+case-ID cohorts. Add/remove set operations also remain case-ID based.
