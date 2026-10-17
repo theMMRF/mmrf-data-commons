@@ -2,6 +2,8 @@
 
 Restart Next after changing environment variables. In development the browser uses `/protein-paint` on the frontend origin; Next forwards the request server-side. These PP requests do not require Chrome --disable-web-security or a separate TLS proxy. Other application routes and login configuration are unchanged.
 
+Older local setups set `NEXT_PUBLIC_PROTEINPAINT_API=/auth/api/custom/proteinpaint` in `.env.development.local`. That file overrides `.env.development`, and the old path returns 404 locally, so PP tools show "no genome data". Remove the line, or set it to `/protein-paint`.
+
 ## Local frontend and local PP backend
 
 Start your normal PP backend on localhost port 3000, then start Virtual Lab on port 3333:
