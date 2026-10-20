@@ -3,7 +3,6 @@ import {
   convertFilterSetToGqlFilter,
   EmptyFilterSet,
   FilterSet,
-  joinFilters,
 } from '@gen3/core';
 import { ButtonProps, Tooltip } from "@mantine/core";
 import tw from "tailwind-styled-components";
@@ -11,6 +10,10 @@ import { FaPlus as PlusIcon  } from 'react-icons/fa';
 
 import { MAX_CASES, useLazyGetCohortCentricQuery } from '@/core';
 import { openModalWithCohortFilterRepresentation } from '@/features/cases/CasesCohortButton/CasesCohortButton';
+import {
+  canSaveCohortSelectionAsFilters,
+  intersectCohortSelection,
+} from '@/features/cohort/selectionFilters';
 
 interface CohortCreationStyledButtonProps extends ButtonProps {
   $fullWidth?: boolean;
@@ -94,6 +97,7 @@ const CohortCreationButton: React.FC<CohortCreationButtonProps> = ({
                                                                      numCases,
                                                                      filter,
                                                                      caseFilter,
+                                                                     createStaticCohort = false,
                                                                      asFilterRepresentation = false,
 }: CohortCreationButtonProps) => {
   const [loading, setLoading] = useState(false);
@@ -116,8 +120,8 @@ const CohortCreationButton: React.FC<CohortCreationButtonProps> = ({
 
   }, [data, isFetching, isSuccess])
 
-  const cohortFilterGql = convertFilterSetToGqlFilter(caseFilter??EmptyFilterSet);
-  const filterGql = convertFilterSetToGqlFilter(filter??EmptyFilterSet);
+  const cohortFilterGql = convertFilterSetToGqlFilter(caseFilter ?? EmptyFilterSet, caseFilter?.mode ?? 'and');
+  const filterGql = convertFilterSetToGqlFilter(filter ?? EmptyFilterSet, filter?.mode ?? 'and');
 
   return (
       <div className="p-1">
@@ -147,14 +151,15 @@ const CohortCreationButton: React.FC<CohortCreationButtonProps> = ({
               return;
             }
 
-            if (asFilterRepresentation) {
-              openModalWithCohortFilterRepresentation(
-                joinFilters(
-                  caseFilter ?? EmptyFilterSet,
-                  filter ?? EmptyFilterSet,
-                ),
+            if (asFilterRepresentation && !createStaticCohort) {
+              const selectedFilters = intersectCohortSelection(
+                caseFilter ?? EmptyFilterSet,
+                filter ?? EmptyFilterSet,
               );
-              return;
+              if (canSaveCohortSelectionAsFilters(selectedFilters)) {
+                openModalWithCohortFilterRepresentation(selectedFilters);
+                return;
+              }
             }
 
             setLoading(true);
