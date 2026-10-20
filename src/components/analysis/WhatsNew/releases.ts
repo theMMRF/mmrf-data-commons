@@ -20,6 +20,38 @@ export interface Release {
  */
 export const RELEASES: ReadonlyArray<Release> = [
   {
+    id: '2026-10-16-proteinpaint-2.216',
+    date: '2026-10-16',
+    title: 'Download chart statistics',
+    source: 'proteinpaint',
+    version: '2.216',
+    changes: [
+      'Bar charts, violin plots, and box plots can download their summary statistics and association tests.',
+    ],
+    appIds: ['Correlation'],
+  },
+  {
+    id: '2026-10-14-discovery-and-sign-in',
+    date: '2026-10-14',
+    title: 'Discovery study details are back',
+    source: 'virtual-lab',
+    changes: [
+      'Selecting a study in Discovery opens its details again.',
+      'Each study has its own link to bookmark or share.',
+      'When your session expires on a case, file, project, gene, or mutation page, you sign in and return to that page.',
+    ],
+  },
+  {
+    id: '2026-10-09-case-files',
+    date: '2026-10-09',
+    title: 'Case pages list their files',
+    source: 'virtual-lab',
+    changes: [
+      'The Files table on a case page lists every file for that case, matching the case summary.',
+      'Search, sort, export, and download work across all of the case’s files.',
+    ],
+  },
+  {
     id: '2026-09-29-proteinpaint-2.214',
     date: '2026-09-29',
     title: 'More reliable group comparisons',

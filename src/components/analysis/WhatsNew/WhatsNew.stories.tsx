@@ -18,6 +18,11 @@ const sections = config.sections.map((section) => ({
 const tools = sections.flatMap(
   (section) => section.tools,
 ) as AnalysisToolConfiguration[];
+const toolTitle = (appId: string) =>
+  tools.find((tool) => tool.appId === appId)?.title;
+const [firstLinkedAppId] = RELEASES.slice(0, 2).flatMap(
+  (release) => release.appIds ?? [],
+);
 
 const meta = {
   component: WhatsNew,
@@ -52,9 +57,9 @@ export const Default: Story = {
     expect(canvas.getAllByText('New')).toHaveLength(1);
 
     const toolLink = canvas.getAllByRole('link', {
-      name: 'Open Differential Gene Expression',
+      name: `Open ${toolTitle(firstLinkedAppId)}`,
     })[0];
-    expect(toolLink).toHaveAttribute('href', '/?app=DE');
+    expect(toolLink).toHaveAttribute('href', `/?app=${firstLinkedAppId}`);
 
     const oldest = RELEASES[RELEASES.length - 1];
     expect(
@@ -83,9 +88,11 @@ export const HiddenToolsAreNotLinked: Story = {
   args: { tools: tools.filter((tool) => tool.appId !== 'DE') },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole('button', { name: /earlier updates/ }),
+    );
     expect(
-      (await canvas.findAllByRole('link', { name: 'Open ProteinPaint' }))
-        .length,
+      canvas.getAllByRole('link', { name: 'Open ProteinPaint' }).length,
     ).toBeGreaterThan(0);
     expect(
       canvas.queryByRole('link', { name: 'Open Differential Gene Expression' }),
