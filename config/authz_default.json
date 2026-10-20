@@ -12,6 +12,27 @@
     "/Profile": {
       "loginRequired": true
     },
+    "/cases/[caseId]": {
+      "loginRequired": true
+    },
+    "/files/[file]": {
+      "loginRequired": true
+    },
+    "/projects/[project]": {
+      "loginRequired": true
+    },
+    "/genes/[gene]": {
+      "loginRequired": true
+    },
+    "/ssms/[ssms]": {
+      "loginRequired": true
+    },
+    "/app/[appName]": {
+      "loginRequired": true
+    },
+    "/cart": {
+      "loginRequired": true
+    },
     "*": {
       "loginRequired": false
     }

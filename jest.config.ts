@@ -5,6 +5,7 @@ const jestConfig: JestConfigWithTsJest = {
   rootDir: __dirname,
   roots: ['<rootDir>/src'],
   moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
     '^@/components(.*)$': '<rootDir>/src/components/$1',
     '^@/lib/(.*)$': '<rootDir>/src/lib/$1',
     '^redux-persist/lib/storage/createWebStorage$':

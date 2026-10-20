@@ -76,6 +76,19 @@ You build a Docker image by:
 ```bash
 docker build .
 ```
+
+## CI and deployment
+
+AWS CodePipeline and CodeBuild handle the deployment image build and storage in
+Amazon ECR. GitHub Actions runs lint and Storybook interaction/accessibility
+checks when a pull request is opened, updated, or reopened. It does not publish
+container images. New commits to the same PR cancel superseded check runs.
+
+The inherited CTDS image-publishing workflow and its bundled security job have
+been removed. GitHub Actions does not need Quay or AWS publishing credentials for
+the retained PR checks. Existing repository secrets are not deleted by this
+change; check their use by other systems before removing them.
+
 ## Updating a forked commons
 
 The following steps usually apply to update a forked commons.

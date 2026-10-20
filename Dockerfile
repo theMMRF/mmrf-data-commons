@@ -10,6 +10,7 @@ WORKDIR /gen3
 
 # Copy dependency files first for better caching
 COPY package.json package-lock.json ./
+COPY scripts/patch-gen3-discovery.cjs ./scripts/patch-gen3-discovery.cjs
 
 # Install ALL dependencies once (including dev deps for build)
 RUN npm config set fetch-retries 5 && \
