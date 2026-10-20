@@ -1,5 +1,5 @@
-import { useCohortFacetsQuery } from "./cohortFacetSlice";
-import { useVennDiagramQuery } from "./vennDiagramSlice";
-import { usePValueQuery } from "./pValueApi";
-
-export { useCohortFacetsQuery, usePValueQuery, useVennDiagramQuery };
+export {
+  useCohortFacetsQuery,
+  usePValueQuery,
+  useVennDiagramQuery,
+} from '@gen3/core';

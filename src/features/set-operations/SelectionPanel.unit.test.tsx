@@ -33,7 +33,7 @@ describe("<SelectionPanel />", () => {
       <SelectionPanel
         app={""}
         setOpen={jest.fn()}
-        selectedEntities={[{ name: "Mutation Set 1", id: "1" }]}
+        selectedEntities={[{ name: "Mutation Set 1", id: "1", count: 100 }]}
         setSelectedEntities={jest.fn()}
         selectedEntityType="cohort"
         setSelectedEntityType={jest.fn()}
@@ -50,9 +50,9 @@ describe("<SelectionPanel />", () => {
         app={''}
         setOpen={jest.fn()}
         selectedEntities={[
-          { name: 'Mutation Set 1', id: '1' },
-          { name: 'Mutation Set 2', id: '2' },
-          { name: 'Mutation Set 3', id: '3' },
+          { name: 'Mutation Set 1', id: '1', count: 100 },
+          { name: 'Mutation Set 2', id: '2', count: 200 },
+          { name: 'Mutation Set 3', id: '3', count: 100 },
         ]}
         setSelectedEntities={jest.fn()}
         selectedEntityType="cohort"
@@ -83,8 +83,8 @@ describe("<SelectionPanel />", () => {
         app={''}
         setOpen={jest.fn()}
         selectedEntities={[
-          { name: 'Mutation Set 1', id: '1' },
-          { name: 'Mutation Set 2', id: '2' },
+          { name: 'Mutation Set 1', id: '1', count: 100 },
+          { name: 'Mutation Set 2', id: '2', count: 200 },
         ]}
         setSelectedEntities={jest.fn()}
         selectedEntityType="cohort"

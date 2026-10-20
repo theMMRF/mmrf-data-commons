@@ -6,7 +6,7 @@ import { DownloadType } from "./types";
 // Chart download context
 
 interface ChartDownloadInfo {
-  readonly chartRef: React.MutableRefObject<HTMLElement>;
+  readonly chartRef: React.MutableRefObject<HTMLElement | null>;
   readonly filename: string;
 }
 

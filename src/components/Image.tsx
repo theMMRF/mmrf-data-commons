@@ -1,5 +1,4 @@
 import React, { JSX } from 'react';
-import getConfig from 'next/config';
 import NextImage, { ImageProps } from 'next/legacy/image';
 
 /**
@@ -12,9 +11,7 @@ export const Image = (props: ImageProps): JSX.Element => {
   const { src } = props;
 
   if (typeof src === 'string') {
-    const {
-      publicRuntimeConfig: { basePath },
-    } = getConfig();
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH;
     const newSrc = generateImageSource(src, basePath);
 
     return <NextImage {...{ ...props, src: newSrc }} />;

@@ -1,18 +1,14 @@
 import React from 'react';
 import { render } from 'test-utils';
 import { CaseSummary } from './CaseSummary';
+import * as caseSlice from '@/core/features/cases/caseSlice';
 
-// Mock the entire module
-jest.mock('@gff/core', () => ({
-  ...jest.requireActual('@gff/core'),
-  useCoreSelector: jest.fn(),
-  useCoreDispatch: jest.fn(),
-  useGetCasesQuery: jest.fn(),
-  useGetAnnotationsQuery: jest.fn(),
+jest.mock('@/core/features/cases/caseSlice', () => ({
+  useCaseSummaryQuery: jest.fn(),
 }));
 
-jest.mock('src/pages/_app', () => ({
-  URLContext: {},
+jest.mock('src/utils/contexts', () => ({
+  URLContext: React.createContext(undefined),
 }));
 
 describe('<CaseSummary />', () => {
@@ -30,12 +26,9 @@ describe('<CaseSummary />', () => {
     };
 
     jest
-      .spyOn(func, 'useGetCasesQuery')
+      .spyOn(caseSlice, 'useCaseSummaryQuery')
       .mockReturnValue(loadingResponse as any);
-    jest
-      .spyOn(func, 'useGetAnnotationsQuery')
-      .mockReturnValue(loadingResponse as any);
-    const { getByTestId } = render(<CaseSummary case_id="testId" bio_id="" />);
+    const { getByTestId } = render(<CaseSummary caseId="testId" bioId="" />);
 
     expect(getByTestId('loading-spinner')).toBeInTheDocument();
   });
@@ -50,12 +43,9 @@ describe('<CaseSummary />', () => {
     };
 
     jest
-      .spyOn(func, 'useGetCasesQuery')
+      .spyOn(caseSlice, 'useCaseSummaryQuery')
       .mockReturnValue(loadingResponse as any);
-    jest
-      .spyOn(func, 'useGetAnnotationsQuery')
-      .mockReturnValue(loadingResponse as any);
-    const { getByText } = render(<CaseSummary case_id="testId" bio_id="" />);
+    const { getByText } = render(<CaseSummary caseId="testId" bioId="" />);
 
     expect(getByText('Case Not Found')).toBeInTheDocument();
   });

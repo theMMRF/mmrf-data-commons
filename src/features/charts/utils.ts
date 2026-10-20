@@ -32,10 +32,13 @@ const isFontRule = (rule: CSSRule): rule is CSSFontFaceRule => {
 
 /**
  * Creates SVG that will display correctly in a download from React element
- * @param ref - React element to create download from
+ * @param element - Chart element to create download from
  * @returns Blob containing the new SVG content
  */
-const createSVG = async (ref: MutableRefObject<HTMLElement>): Promise<Blob> => {
+const createSVG = async (element: HTMLElement): Promise<Blob> => {
+  // Preserve the selected chart before font loading can yield to a re-render.
+  const elementClone = document.importNode(element, true);
+  const { width, height } = element.getBoundingClientRect();
   const svgElement = document.createElementNS(
     "http://www.w3.org/2000/svg",
     "svg",
@@ -85,14 +88,13 @@ const createSVG = async (ref: MutableRefObject<HTMLElement>): Promise<Blob> => {
   );
   chartWrapper.setAttribute(
     "width",
-    `${Number(ref.current?.getBoundingClientRect().width) + EXTRA_PADDING}`,
+    `${width + EXTRA_PADDING}`,
   );
   chartWrapper.setAttribute(
     "height",
-    `${Number(ref.current?.getBoundingClientRect().height) + EXTRA_PADDING}`,
+    `${height + EXTRA_PADDING}`,
   );
-  if (ref)
-  chartWrapper.append(document.importNode(ref.current, true));
+  chartWrapper.append(elementClone);
   svgElement.append(chartWrapper);
 
   const svgBlob = new Blob(
@@ -111,11 +113,12 @@ const createSVG = async (ref: MutableRefObject<HTMLElement>): Promise<Blob> => {
  * @param filename - name of file to save to, extension should be included e.g. chart1.svg
  */
 export const handleDownloadSVG = async (
-  ref: React.MutableRefObject<HTMLElement>,
+  ref: MutableRefObject<HTMLElement | null>,
   filename: string,
 ): Promise<void> => {
-  if (ref && ref.current) {
-    const svgBlob = await createSVG(ref);
+  const element = ref.current;
+  if (element) {
+    const svgBlob = await createSVG(element);
     const href = URL.createObjectURL(svgBlob);
     handleDownload(href, filename);
   }
@@ -127,14 +130,18 @@ export const handleDownloadSVG = async (
  * @param filename - name of file to save to, extension should be included e.g. chart1.png
  */
 export const handleDownloadPNG = async (
-  ref: MutableRefObject<HTMLElement>,
+  ref: MutableRefObject<HTMLElement | null>,
   filename: string,
 ): Promise<void> => {
-  const svgBlob = await createSVG(ref);
+  const element = ref.current;
+  if (!element) return;
+
+  const { width, height } = element.getBoundingClientRect();
+  const svgBlob = await createSVG(element);
   const svgHref = URL.createObjectURL(svgBlob);
   const svgImage = new Image(
-    Number(ref.current.getBoundingClientRect().width) + EXTRA_PADDING,
-    Number(ref.current.getBoundingClientRect().height) + EXTRA_PADDING,
+    width + EXTRA_PADDING,
+    height + EXTRA_PADDING,
   );
   const canvas = document.createElement("canvas");
   const canvasCtx = canvas.getContext("2d");

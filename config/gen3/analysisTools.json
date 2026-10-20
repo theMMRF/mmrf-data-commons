@@ -154,6 +154,17 @@
           "countUnits": "Cases"
         },
         {
+          "title": "Bulk RNA-seq UMAP",
+          "type": "application",
+          "hasDemo": false,
+          "loginRequired": false,
+          "description": "Visualize bulk RNA-Seq UMAP.",
+          "icon": "/icons/apps/scRNASeq.svg",
+          "appId": "Umap",
+          "hideCounts": true,
+          "countUnits": "Cases"
+        },
+        {
           "title": "Set Operations",
           "type": "application",
           "hasDemo": false,

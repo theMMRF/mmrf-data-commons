@@ -8,6 +8,8 @@ import {
   //PROTEINPAINT_API,
   useFetchUserDetailsQuery,
   useCoreDispatch,
+  selectAvailableCohorts,
+  EmptyFilterSet,
   convertFilterSetToGqlFilter as buildCohortGqlOperator
 } from "@gen3/core";
 import { isEqual, cloneDeep } from "lodash";
@@ -28,6 +30,18 @@ export const DEwrapper: FC<PpProps> = (props: PpProps) => {
   );
   const filter0 = isDemoMode ? null : buildCohortGqlOperator(currentCohort);
   const userDetails = useFetchUserDetailsQuery()
+
+  // get all cohorts built by user
+  const cohorts = useCoreSelector((state) => selectAvailableCohorts(state));
+  const cohorts0 = cohorts.map((cohort) => {
+    return {
+      id: cohort.id,
+      name: cohort.name,
+      count: cohort.counts?.[COHORT_FILTER_INDEX],
+      // restructure cohort filter into gql filter (same structure as filter0)
+      filter: buildCohortGqlOperator(cohort.filters?.[COHORT_FILTER_INDEX] ?? EmptyFilterSet)
+    }
+  });
 
   // to track reusable instance for mds3 skewer track
   const prevArg = useRef<any>({});
@@ -58,7 +72,8 @@ export const DEwrapper: FC<PpProps> = (props: PpProps) => {
   useDeepCompareEffect(
     () => {
       const rootElem = divRef.current;
-      const data = getDEtrack(props, filter0);
+
+      const data = getDEtrack(props, filter0, cohorts0);
       if (!data) return;
       /*if (isDemoMode) {
         data.geneSymbol = props.hardcodeCnvOnly
@@ -95,7 +110,7 @@ export const DEwrapper: FC<PpProps> = (props: PpProps) => {
       });
     },
 
-    [ isDemoMode, filter0, userDetails.currentData ],
+    [ isDemoMode, filter0, cohorts0, userDetails.currentData ],
   );
 
   const divRef = useRef<HTMLDivElement>(null);
@@ -119,6 +134,17 @@ export const DEwrapper: FC<PpProps> = (props: PpProps) => {
   );
 };
 
+interface Cohort0 {
+  id: string;
+  name: string;
+  count: number;
+  filter: FilterSet;
+}
+
+interface DEargOpts {
+  cohorts0?: Cohort0[];
+}
+
 interface Mds3Arg {
   dslabel?: string;
   holder?: HTMLElement;
@@ -127,12 +153,14 @@ interface Mds3Arg {
   hide_dsHandles?: boolean;
   host: string;
   filter0?: FilterSet;
+  opts?: DEargOpts;
   launchGdcDE?: boolean;
 }
 
 function getDEtrack(
   props: PpProps,
-  filter0: any
+  filter0: any,
+  cohorts0: any
 ) {
   const arg: Mds3Arg = {
     dslabel: 'MMRF',
@@ -141,6 +169,7 @@ function getDEtrack(
     host: props.basepath || (basepath as string),
     launchGdcDE: true,
     filter0,
+    opts: { cohorts0 }
   };
 
   return arg;

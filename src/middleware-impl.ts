@@ -14,8 +14,44 @@ import { getSafeReferer } from './lib/terms/referer';
 const WILDCARD_ROUTE_KEY = '*';
 const ROOT_PATH = '/';
 
+// These development routes forward data requests to services that enforce
+// their own access policy. Running the page gate here repeats Fence/terms
+// requests for every visualization query. Pages still pass through that gate;
+// PP target validation and credential handling remain in its API handler.
+const DEVELOPMENT_DATA_PROXY_PATHS = [
+  '/protein-paint',
+  '/api/protein-paint',
+  '/analysis/v0',
+  '/guppy',
+];
+
 function getRouteRuleForPath(pathname: string, routeConfig: RouteConfig) {
-  return routeConfig?.[pathname] ?? routeConfig?.[WILDCARD_ROUTE_KEY];
+  const exactRule = routeConfig?.[pathname];
+  if (exactRule) return exactRule;
+
+  // Config keys use Next.js page paths, e.g. /cases/[caseId]. Incoming
+  // requests contain the actual ID, so match each dynamic segment before
+  // falling back to the public wildcard rule.
+  const pathSegments = pathname.split('/');
+  for (const [route, rule] of Object.entries(routeConfig ?? {})) {
+    const routeSegments = route.split('/');
+    if (
+      routeSegments.length === pathSegments.length &&
+      routeSegments.every(
+        (segment, index) =>
+          segment === pathSegments[index] ||
+          (/^\[\w+\]$/.test(segment) && pathSegments[index] !== ''),
+      )
+    ) {
+      return rule;
+    }
+  }
+
+  // Study permalinks share Discovery's policy even without a separate rule.
+  const discoveryRule = pathname.startsWith('/Discovery/')
+    ? routeConfig?.['/Discovery']
+    : undefined;
+  return discoveryRule ?? routeConfig?.[WILDCARD_ROUTE_KEY];
 }
 
 function isLoggedIn(loginStatus: LoginStatus) {
@@ -34,6 +70,14 @@ function redirectToLogin(req: NextRequest) {
 
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
+  if (
+    process.env.NODE_ENV === 'development' &&
+    DEVELOPMENT_DATA_PROXY_PATHS.some(
+      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+    )
+  ) {
+    return NextResponse.next();
+  }
   const cookieHeader = req.headers.get('Cookie') || '';
   let loginStatus: LoginStatus | null = null;
 
@@ -46,9 +90,11 @@ export async function middleware(req: NextRequest) {
     const loginStatus = await getRequestLoginStatus();
 
     if (loginStatus.status === 'issued') {
-      const termsGate = await fetchTermsAcceptedFromBff(req);
+      const termsGate = await fetchTermsAcceptedFromBff(req, loginStatus);
 
-      if (termsGate.isLoggedIn && !termsGate.hasAcceptedLatestTerms) {
+      if (!termsGate.isLoggedIn) return redirectToLogin(req);
+
+      if (!termsGate.hasAcceptedLatestTerms) {
         const termsUrl = new URL('/TermsAcceptance', req.url);
         termsUrl.searchParams.set(
           'referer',
@@ -67,11 +113,7 @@ export async function middleware(req: NextRequest) {
   }
 
   const { routes: routeConfig } = await getRouteConfig();
-  let rule = getRouteRuleForPath(pathname, routeConfig);
-
-  if (!rule) {
-    rule = getRouteRuleForPath('*', routeConfig);
-  }
+  const rule = getRouteRuleForPath(pathname, routeConfig);
 
   if (!rule) {
     return NextResponse.next();
