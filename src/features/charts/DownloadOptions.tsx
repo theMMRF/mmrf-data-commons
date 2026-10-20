@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActionIcon, Menu, Tooltip } from '@mantine/core';
-import Plotly from 'plotly.js';
+import Plotly from 'plotly.js/dist/plotly';
 import { JSONArray } from '@/features/types';
 import { DownloadIcon } from '@/utils/icons';
 

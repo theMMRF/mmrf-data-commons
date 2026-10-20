@@ -15,7 +15,7 @@ import {
   cnvMapping,
   hovertemplate,
 } from './utils';
-import { PlotMouseEvent } from 'plotly.js';
+import type { PlotMouseEvent } from 'plotly.js';
 import { useDeepCompareMemo } from 'use-deep-compare';
 import BarChartTextVersion from '../BarChartTextVersion';
 
