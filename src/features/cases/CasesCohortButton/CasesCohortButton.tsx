@@ -13,10 +13,13 @@ import { useLazyCohortCaseIdQuery } from "@/core/features/cases/caseSlice";
 import {
   EmptyFilterSet,
   FilterSet,
-  joinFilters,
   selectCurrentCohortFilters,
   useCoreSelector,
 } from '@gen3/core';
+import {
+  canSaveCohortSelectionAsFilters,
+  intersectCohortSelection,
+} from '@/features/cohort/selectionFilters';
 
 interface CasesCohortButtonProps {
   readonly filters: FilterSet;
@@ -84,14 +87,13 @@ export const CasesCohortButton: React.FC<CasesCohortButtonProps> = ({
   const [openSelectCohorts, setOpenSelectCohorts] = useState(false);
   const [withOrWithoutCohort, setWithOrWithoutCohort] =
     useState<WithOrWithoutCohortType>(undefined);
-  // TODO: To save a cohort as filters remove this and pass the filters directly to the modal
   const [fetchCaseIds, { isFetching }] = useLazyCohortCaseIdQuery();
 
 
   const cohortFilters = useCoreSelector(selectCurrentCohortFilters);
   const cohortFilter = cohortFilters?.[COHORT_FILTER_INDEX] ?? EmptyFilterSet;
 
-  const createCohortFilters = joinFilters(cohortFilter, filters);
+  const createCohortFilters = intersectCohortSelection(cohortFilter, filters);
 
   // can reuse also in SelectCohortsModal right now
   const getCaseIdsFromFilter = (filter: any): ReadonlyArray<string> | null => {
@@ -120,7 +122,7 @@ export const CasesCohortButton: React.FC<CasesCohortButtonProps> = ({
         // Use extracted IDs directly
         openSaveCohortModal(directCaseIds);
       } else {
-        if (asFilterRepresentation) {
+        if (asFilterRepresentation && canSaveCohortSelectionAsFilters(createCohortFilters)) {
           openModalWithCohortFilterRepresentation(createCohortFilters);
         } else {
           // Fetch case IDs from current filters

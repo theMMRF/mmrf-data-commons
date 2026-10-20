@@ -24,7 +24,8 @@
     "test:metadata-auth": "node --test test/protein-paint-auth.test.cjs",
     "test:umap-release": "node --test test/umap-release.test.cjs",
     "test:navigation-auth": "node --test test/navigation-auth.test.cjs && jest --runInBand src/middleware-impl.unit.test.ts",
-    "test:discovery": "node --test test/gen3-discovery-patch.test.cjs && jest --runInBand src/lib/content/loadAppConfig.unit.test.ts src/middleware-impl.unit.test.ts"
+    "test:discovery": "node --test test/gen3-discovery-patch.test.cjs && jest --runInBand src/lib/content/loadAppConfig.unit.test.ts src/middleware-impl.unit.test.ts",
+    "test:cohort-filters": "jest --runInBand src/features/cohort/selectionFilters.unit.test.ts src/features/cohort/selectionFiltersView.unit.test.tsx src/components/CohortCreationButton.unit.test.tsx src/features/cases/CasesCohortButton/CasesCohortButton.unit.test.tsx"
   },
   "dependencies": {
     "@fontsource/montserrat": "^5.2.8",

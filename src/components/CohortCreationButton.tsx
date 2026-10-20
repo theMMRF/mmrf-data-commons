@@ -10,6 +10,10 @@ import { FaPlus as PlusIcon  } from 'react-icons/fa';
 
 import { MAX_CASES, useLazyGetCohortCentricQuery } from '@/core';
 import { openModalWithCohortFilterRepresentation } from '@/features/cases/CasesCohortButton/CasesCohortButton';
+import {
+  canSaveCohortSelectionAsFilters,
+  intersectCohortSelection,
+} from '@/features/cohort/selectionFilters';
 
 interface CohortCreationStyledButtonProps extends ButtonProps {
   $fullWidth?: boolean;
@@ -77,6 +81,7 @@ interface CohortCreationButtonProps {
   readonly caseFilter: FilterSet;
   readonly filtersCallback?: () => Promise<FilterSet>;
   readonly createStaticCohort?: boolean;
+  readonly asFilterRepresentation?: boolean;
 }
 
 /**
@@ -91,7 +96,9 @@ const CohortCreationButton: React.FC<CohortCreationButtonProps> = ({
                                                                      label,
                                                                      numCases,
                                                                      filter,
-                                                                     caseFilter
+                                                                     caseFilter,
+                                                                     createStaticCohort = false,
+                                                                     asFilterRepresentation = false,
 }: CohortCreationButtonProps) => {
   const [loading, setLoading] = useState(false);
   const disabled = numCases === undefined || numCases === 0;
@@ -113,8 +120,8 @@ const CohortCreationButton: React.FC<CohortCreationButtonProps> = ({
 
   }, [data, isFetching, isSuccess])
 
-  const cohortFilterGql = convertFilterSetToGqlFilter(caseFilter??EmptyFilterSet);
-  const filterGql = convertFilterSetToGqlFilter(filter??EmptyFilterSet);
+  const cohortFilterGql = convertFilterSetToGqlFilter(caseFilter ?? EmptyFilterSet, caseFilter?.mode ?? 'and');
+  const filterGql = convertFilterSetToGqlFilter(filter ?? EmptyFilterSet, filter?.mode ?? 'and');
 
   return (
       <div className="p-1">
@@ -142,6 +149,17 @@ const CohortCreationButton: React.FC<CohortCreationButtonProps> = ({
           onClick={async () => {
             if (loading) {
               return;
+            }
+
+            if (asFilterRepresentation && !createStaticCohort) {
+              const selectedFilters = intersectCohortSelection(
+                caseFilter ?? EmptyFilterSet,
+                filter ?? EmptyFilterSet,
+              );
+              if (canSaveCohortSelectionAsFilters(selectedFilters)) {
+                openModalWithCohortFilterRepresentation(selectedFilters);
+                return;
+              }
             }
 
             setLoading(true);
