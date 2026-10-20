@@ -26,7 +26,32 @@ const DEVELOPMENT_DATA_PROXY_PATHS = [
 ];
 
 function getRouteRuleForPath(pathname: string, routeConfig: RouteConfig) {
-  return routeConfig?.[pathname] ?? routeConfig?.[WILDCARD_ROUTE_KEY];
+  const exactRule = routeConfig?.[pathname];
+  if (exactRule) return exactRule;
+
+  // Config keys use Next.js page paths, e.g. /cases/[caseId]. Incoming
+  // requests contain the actual ID, so match each dynamic segment before
+  // falling back to the public wildcard rule.
+  const pathSegments = pathname.split('/');
+  for (const [route, rule] of Object.entries(routeConfig ?? {})) {
+    const routeSegments = route.split('/');
+    if (
+      routeSegments.length === pathSegments.length &&
+      routeSegments.every(
+        (segment, index) =>
+          segment === pathSegments[index] ||
+          (/^\[\w+\]$/.test(segment) && pathSegments[index] !== ''),
+      )
+    ) {
+      return rule;
+    }
+  }
+
+  // Study permalinks share Discovery's policy even without a separate rule.
+  const discoveryRule = pathname.startsWith('/Discovery/')
+    ? routeConfig?.['/Discovery']
+    : undefined;
+  return discoveryRule ?? routeConfig?.[WILDCARD_ROUTE_KEY];
 }
 
 function isLoggedIn(loginStatus: LoginStatus) {
@@ -88,11 +113,7 @@ export async function middleware(req: NextRequest) {
   }
 
   const { routes: routeConfig } = await getRouteConfig();
-  let rule = getRouteRuleForPath(pathname, routeConfig);
-
-  if (!rule) {
-    rule = getRouteRuleForPath('*', routeConfig);
-  }
+  const rule = getRouteRuleForPath(pathname, routeConfig);
 
   if (!rule) {
     return NextResponse.next();

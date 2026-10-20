@@ -67,6 +67,8 @@ const graphQLQuery = `query Case_case($filter: JSON) {
             file_id
             data_type
             data_format
+            experimental_strategy
+            platform
             state
             created_datetime
             updated_datetime

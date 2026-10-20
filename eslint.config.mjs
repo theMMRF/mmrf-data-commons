@@ -67,7 +67,7 @@ export default [
     },
   },
   {
-    files: ['test/**/*.cjs'],
+    files: ['test/**/*.cjs', 'scripts/**/*.cjs'],
     languageOptions: {
       sourceType: 'commonjs',
       globals: globals.node,
