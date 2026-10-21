@@ -1,8 +1,12 @@
 jest.mock('@gen3/frontend', () => ({ DAYS_IN_YEAR: 365.25 }));
-import { DATA_DIMENSIONS } from './constants';
+import { DATA_DIMENSIONS, FACET_SORT } from './constants';
 import { convertDataDimension, useDataDimension } from './utils';
 
 describe('diagnosis age contract', () => {
+  it('exposes the diagnosis age field under its actual clinical data group', () => {
+    expect(FACET_SORT.diagnoses).toContain('age_at_diagnosis');
+    expect(FACET_SORT.demographic).not.toContain('age_at_diagnosis');
+  });
   it('keeps API ages in years and offers no days conversion toggle', () => {
     expect(DATA_DIMENSIONS['diagnoses.age_at_diagnosis']).toEqual({ unit: 'Years' });
     expect(useDataDimension('diagnoses.age_at_diagnosis')).toBe(false);

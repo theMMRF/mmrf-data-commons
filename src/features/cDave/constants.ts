@@ -86,11 +86,11 @@ export const FACET_SORT: Record<string, Array<string>> = {
     'ethnicity',
     'vital_status',
     'age_at_index',
-    'age_at_diagnosis',
     'year_of_death',
     'days_to_death',
   ],
   diagnoses: [
+    'age_at_diagnosis',
     'days_to_diagnosis',
     'days_to_last_follow_up',
     'iss_stage',
