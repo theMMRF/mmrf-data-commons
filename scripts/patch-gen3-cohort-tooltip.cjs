@@ -9,6 +9,12 @@ const replacements = [
   [`label="${label}"`, `label="${label}" disabled`],
 ];
 
+/**
+ * Disable the selector explanation in the pinned Gen3 bundles and source maps.
+ * Safe to reapply after a full or partial installation.
+ * @param {string} packageRoot Installed @gen3/frontend package directory.
+ * @throws {Error} If the dependency version or expected tooltip has changed.
+ */
 function patchGen3CohortTooltip(packageRoot) {
   const { version } = JSON.parse(
     fs.readFileSync(path.join(packageRoot, 'package.json'), 'utf8'),
@@ -31,11 +37,12 @@ function patchGen3CohortTooltip(packageRoot) {
     for (const [original, replacement] of replacements) {
       const before = isMap ? JSON.stringify(original).slice(1, -1) : original;
       const after = isMap ? JSON.stringify(replacement).slice(1, -1) : replacement;
-      if (updated.includes(after)) matched = true;
-      // The replacement includes the original; leave already-patched bundles alone.
-      if (!updated.includes(before) || updated.includes(after)) continue;
+      if (!updated.includes(before)) continue;
       matched = true;
-      updated = updated.replaceAll(before, after);
+      // Preserve patched occurrences while repairing any unpatched neighbors.
+      updated = updated.replaceAll(before, (match, offset, text) =>
+        text.startsWith(after, offset) ? match : after,
+      );
     }
     if (updated !== source) fs.writeFileSync(filename, updated);
   }
