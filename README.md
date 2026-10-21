@@ -71,10 +71,31 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Docker
 
+### Synthetic sandbox builds
+
+Google Analytics and its tracking-consent modal are disabled for synthetic builds,
+development/test builds, loopback hosts, and hosts other than the build-time
+`NEXT_PUBLIC_GA_HOSTNAME`. The production configuration permits only
+`virtuallab.themmrf.org`; consent and `NEXT_PUBLIC_GA_MEASUREMENT_ID` are still
+required to load Google Analytics there. Keep that hostname restricted to the
+production site when building dev/preview images. Essential application cookies
+and local cohort storage continue to work without the tracking modal. These
+`NEXT_PUBLIC_` settings require rebuilding the frontend image.
+
+The standalone [Virtual Lab sandbox](https://github.com/theMMRF/mmrf-virtual-lab-sandbox)
+provides generated data, a disposable local identity provider, and local/AWS
+deployment configuration. Build with `NEXT_PUBLIC_SYNTHETIC_SANDBOX=1` to show a
+synthetic-data notice, disable analytics, and prevent demo-mode URLs from loading
+the historical demonstration fixtures. This flag does not bypass authentication;
+the sandbox supplies its own isolated identity services. Leave the flag unset
+for normal deployments.
+
 You build a Docker image by:
 
 ```bash
 docker build .
+# Presentation flag only; use the standalone sandbox for generated data/services.
+docker build --build-arg NEXT_PUBLIC_SYNTHETIC_SANDBOX=1 .
 ```
 
 ## CI and deployment
