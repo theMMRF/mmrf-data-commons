@@ -7,7 +7,7 @@
     "node": ">=24.18.1"
   },
   "scripts": {
-    "postinstall": "node scripts/patch-gen3-discovery.cjs",
+    "postinstall": "node scripts/patch-gen3-discovery.cjs && node scripts/patch-gen3-cohort-tooltip.cjs",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix",
     "dev": "next dev --turbopack",
