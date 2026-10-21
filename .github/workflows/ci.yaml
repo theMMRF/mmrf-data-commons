@@ -47,3 +47,5 @@ jobs:
         run: NODE_OPTIONS=--no-experimental-strip-types npm run test:discovery
       - name: Run diagnosis age regression tests
         run: NODE_OPTIONS=--no-experimental-strip-types npm run test:diagnosis-age
+      - name: Run analytics environment regression tests
+        run: NODE_OPTIONS=--no-experimental-strip-types npm run test:analytics
