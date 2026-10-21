@@ -16,8 +16,8 @@ test('repairs mixed tooltip bundles and source maps without duplicating disabled
   const action = 'label: "Rename selected cohort",';
   const bundle = [patched, original, action, original].join('\n');
   const expected = [patched, patched, action, patched].join('\n');
-  const files = ['index/esm/index-hash.js', 'index/cjs/index-hash.js',
-    'pages/esm/index-hash.js', 'pages/cjs/index-hash.js'];
+  const files = ['index/esm/index-dIlISsbI.js', 'index/cjs/index-BvGrZnWS.js',
+    'pages/esm/index-C4fuwGDz.js', 'pages/cjs/index-DU3UvuNZ.js'];
   const source = `<Tooltip label="${label}" disabled /><Tooltip label="${label}" />`;
   const expectedSource = `<Tooltip label="${label}" disabled /><Tooltip label="${label}" disabled />`;
 
@@ -37,4 +37,10 @@ test('repairs mixed tooltip bundles and source maps without duplicating disabled
         [expectedSource]);
     }
   }
+
+  // A matching source map must not hide a missing runtime tooltip match.
+  fs.writeFileSync(path.join(root, 'dist', files[0]), 'unrelated runtime bundle');
+  assert.throws(() => patchGen3CohortTooltip(root), /index-dIlISsbI\.js/);
+  fs.rmSync(path.join(root, 'dist', files[1]));
+  assert.throws(() => patchGen3CohortTooltip(root), /index-BvGrZnWS\.js/);
 });

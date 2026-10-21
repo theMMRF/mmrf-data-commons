@@ -23,7 +23,14 @@ function patchGen3CohortTooltip(packageRoot) {
     throw new Error('Reassess the cohort tooltip patch when upgrading @gen3/frontend.');
   }
 
-  let matched = false;
+  // These are the active chunks exported by the pinned 0.12.66 package.
+  const requiredFiles = [
+    'dist/index/cjs/index-BvGrZnWS.js',
+    'dist/index/esm/index-dIlISsbI.js',
+    'dist/pages/cjs/index-DU3UvuNZ.js',
+    'dist/pages/esm/index-C4fuwGDz.js',
+  ].flatMap((filename) => [filename, `${filename}.map`]);
+  const matchedFiles = new Set();
   // Cover both entry points, CommonJS/ESM, and embedded source-map content.
   for (const entry of fs.readdirSync(path.join(packageRoot, 'dist'), {
     recursive: true,
@@ -38,7 +45,7 @@ function patchGen3CohortTooltip(packageRoot) {
       const before = isMap ? JSON.stringify(original).slice(1, -1) : original;
       const after = isMap ? JSON.stringify(replacement).slice(1, -1) : replacement;
       if (!updated.includes(before)) continue;
-      matched = true;
+      matchedFiles.add(path.relative(packageRoot, filename));
       // Preserve patched occurrences while repairing any unpatched neighbors.
       updated = updated.replaceAll(before, (match, offset, text) =>
         text.startsWith(after, offset) ? match : after,
@@ -46,8 +53,9 @@ function patchGen3CohortTooltip(packageRoot) {
     }
     if (updated !== source) fs.writeFileSync(filename, updated);
   }
-  if (!matched) {
-    throw new Error('Could not find the expected Gen3 cohort selector tooltip.');
+  const missingFiles = requiredFiles.filter((filename) => !matchedFiles.has(filename));
+  if (missingFiles.length) {
+    throw new Error(`Could not find the expected Gen3 cohort selector tooltip in: ${missingFiles.join(', ')}`);
   }
 }
 
