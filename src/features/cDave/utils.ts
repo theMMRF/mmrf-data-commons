@@ -92,11 +92,14 @@ export const combineAnalysisResults = (
 
   const processStats = Object.entries(stats).reduce(
     (acc: Record<string, StatValues>, [field, x]) => {
+      // Guppy numeric histograms return a single aggregate in an array.
+      // Also accept the flat stats shape used by older callers.
+      const values = isArray(x) ? x[0] : x;
       const convertedData = {
-        count: x.count ?? 0,
-        max: x.max ?? 0,
-        min: x.min ?? 0,
-        sum: x.sum ?? 0,
+        count: values?.count ?? 0,
+        max: values?.max ?? 0,
+        min: values?.min ?? 0,
+        sum: values?.sum ?? 0,
       };
 
       acc[field] = convertedData;
