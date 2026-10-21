@@ -71,6 +71,16 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Docker
 
+### Synthetic sandbox builds
+
+The standalone [Virtual Lab sandbox](https://github.com/theMMRF/mmrf-virtual-lab-sandbox)
+provides generated data, a disposable local identity provider, and local/AWS
+deployment configuration. Build with `NEXT_PUBLIC_SYNTHETIC_SANDBOX=1` to show a
+synthetic-data notice, disable analytics, and prevent demo-mode URLs from loading
+the historical demonstration fixtures. This flag does not bypass authentication;
+the sandbox supplies its own isolated identity services. Leave the flag unset
+for normal deployments.
+
 You build a Docker image by:
 
 ```bash

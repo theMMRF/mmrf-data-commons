@@ -64,6 +64,7 @@ const Gen3App = ({
   const isFirstRender = useRef(true);
   const router = useRouter();
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  const syntheticSandbox = process.env.NEXT_PUBLIC_SYNTHETIC_SANDBOX === '1';
   const hideMainNavigation = router.pathname === "/Login";
 
   useEffect(() => {
@@ -115,10 +116,15 @@ const Gen3App = ({
               contextModals={mmrfModals}
             >
               <Gen3GDCCompatabilityProvider>
+                {syntheticSandbox && (
+                  <div role="note" className="bg-amber-100 p-3 text-center text-sm text-amber-950">
+                    Synthetic sandbox — all data is fabricated and has no clinical meaning.
+                  </div>
+                )}
                 {!hideMainNavigation && <MainNavigation />}
                 <Component {...pageProps} />
                 <GoogleAnalyticsLoader
-                  enabled={cookieConsentState === 'accepted'}
+                  enabled={!syntheticSandbox && cookieConsentState === 'accepted'}
                   gaMeasurementId={gaMeasurementId}
                 />
                 {cookieConsentState === 'pending' && (
