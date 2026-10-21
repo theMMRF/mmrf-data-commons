@@ -112,10 +112,7 @@ export const DATA_DIMENSIONS: Record<
   string,
   { unit: DataDimension; toggleValue?: DataDimension }
 > = {
-  'diagnoses.age_at_diagnosis': {
-    unit: 'Days',
-    toggleValue: 'Years',
-  },
+  'diagnoses.age_at_diagnosis': { unit: 'Years' },
   'demographic.days_to_birth': { unit: 'Days', toggleValue: 'Years' },
   'demographic.days_to_death': { unit: 'Days', toggleValue: 'Years' },
   'diagnoses.days_to_diagnosis': { unit: 'Days', toggleValue: 'Years' },
