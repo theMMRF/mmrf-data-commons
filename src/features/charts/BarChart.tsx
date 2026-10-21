@@ -135,7 +135,7 @@ const BarChart: React.FC<BarChartProps> = ({
           barmode: stacked ? 'stack' : 'group',
           // Plotly schedules delayed draws during animated updates. Tabs can
           // unmount this plot before those draws run, so update synchronously.
-          transition: { duration: 0 },
+          transition: { duration: 0, easing: 'cubic-in-out' },
         }
       : {
           // (bars are horizontal)
