@@ -85,6 +85,8 @@ You build a Docker image by:
 
 ```bash
 docker build .
+# Presentation flag only; use the standalone sandbox for generated data/services.
+docker build --build-arg NEXT_PUBLIC_SYNTHETIC_SANDBOX=1 .
 ```
 
 ## CI and deployment

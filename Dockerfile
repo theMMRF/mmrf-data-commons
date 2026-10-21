@@ -32,6 +32,7 @@ COPY ./start.sh ./
 
 ENV NODE_OPTIONS=--max-old-space-size=6144
 # Build and prune
+ARG NEXT_PUBLIC_SYNTHETIC_SANDBOX=
 RUN npm run build && \
     npm prune --omit=dev;
 
