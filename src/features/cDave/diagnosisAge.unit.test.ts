@@ -1,7 +1,7 @@
 jest.mock('@gen3/frontend', () => ({ DAYS_IN_YEAR: 365.25 }));
 import { DATA_DIMENSIONS, FACET_SORT } from './constants';
 import type { StatsData } from '@gen3/core';
-import { combineAnalysisResults, convertDataDimension, useDataDimension } from './utils';
+import { combineAnalysisResults, createDiagnosisAgeBuckets, convertDataDimension, useDataDimension } from './utils';
 
 describe('diagnosis age contract', () => {
   it('exposes the diagnosis age field under its actual clinical data group', () => {
@@ -37,4 +37,13 @@ describe('numeric clinical age bounds', () => {
       'diagnoses.age_at_diagnosis': [],
     } as unknown as StatsData)['diagnoses.age_at_diagnosis']).toEqual({ count: 0, min: 0, max: 0, sum: 0 });
   });
+});
+
+
+it.each([[40, 84], [47, 47], [40, 90], [0, 0]])('includes ages at both ends of %s through %s exactly once', (min, max) => {
+  const ranges = createDiagnosisAgeBuckets(min, max);
+  for (const age of [min, max]) {
+    expect(ranges.filter(r => age >= r.from && age < r.to)).toHaveLength(1);
+  }
+  expect(ranges.every(r => r.to - r.from === 10)).toBe(true);
 });

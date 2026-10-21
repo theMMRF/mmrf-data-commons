@@ -31,6 +31,7 @@ import {
 import {
   isInterval,
   createBuckets,
+  createDiagnosisAgeBuckets,
   parseContinuousBucket,
   convertDataDimension,
   roundContinuousValue,
@@ -175,7 +176,9 @@ const ContinuousData: React.FC<ContinuousDataProps> = ({
                 to: d.to,
                 from: d.from,
               }))
-            : createBuckets(rangeDefinition.min,  rangeDefinition?.max, rangeDefinition?.step),
+            : field === 'diagnoses.age_at_diagnosis'
+            ? createDiagnosisAgeBuckets(rangeDefinition.min, rangeDefinition.max)
+            : createBuckets(rangeDefinition.min, rangeDefinition?.max, rangeDefinition?.step),
       [customBinnedData, initialData],
     );
 

@@ -137,6 +137,15 @@ export const createBuckets = (
   }));
 };
 
+export const createDiagnosisAgeBuckets = (min: number, max: number): NumericFromTo[] => {
+  const start = Math.floor(min / 10) * 10;
+  const end = (Math.floor(max / 10) + 1) * 10;
+  return Array.from({ length: (end - start) / 10 }, (_, i) => ({
+    from: start + i * 10,
+    to: start + (i + 1) * 10,
+  }));
+};
+
 export const toDisplayName = (field: string): string => {
   const parsed = field.split('.');
   const fieldName = parsed.at(-1);
