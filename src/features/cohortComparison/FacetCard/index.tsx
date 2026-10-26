@@ -61,7 +61,7 @@ export const FacetCard: React.FC<FacetCardProps> = ({
   );
 
   if (field === "diagnoses.age_at_diagnosis") {
-    uniqueValues.sort();
+    uniqueValues.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
   }
 
   formattedData = useMemo(() => formattedData.map((cohort) =>
