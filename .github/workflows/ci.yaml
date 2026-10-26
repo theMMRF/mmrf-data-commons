@@ -45,5 +45,7 @@ jobs:
         run: npm run lint
       - name: Run Discovery regression tests
         run: NODE_OPTIONS=--no-experimental-strip-types npm run test:discovery
+      - name: Run cohort tooltip patch regression test
+        run: npm run test:cohort-tooltip
       - name: Run diagnosis age regression tests
         run: NODE_OPTIONS=--no-experimental-strip-types npm run test:diagnosis-age
