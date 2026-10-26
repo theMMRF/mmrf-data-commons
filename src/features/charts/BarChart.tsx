@@ -1,5 +1,5 @@
 import React from 'react';
-import { Config, Layout, PlotMouseEvent, PlotData } from 'plotly.js';
+import type { Config, Layout, PlotMouseEvent, PlotData } from 'plotly.js';
 import Plot from 'react-plotly.js';
 
 export interface BarChartData {

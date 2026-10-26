@@ -32,12 +32,12 @@ This documentation is currently less complete than we would like, but we will be
 
 ## Installation
 
-The minimum node version is set to v20.11.0 only from an LTS perspective.
+This project requires Node v24.18.1 or later and npm v11.16.0 or later, the versions used by the Docker image and CI. `.npmrc` sets `engine-strict`, so `npm install` and `npm ci` stop with an engine error on older versions, and dependency updates from `package-lock.json` are not installed.
 Node can be downloaded from the official Node.js site. You may also consider using a [Node version manager](https://docs.npmjs.com/cli/v7/configuring-npm/install#using-a-node-version-manager-to-install-nodejs-and-npm).
-Your version of Node may not ship with npm v10. To install it, run:
+If your version of Node ships an older npm, install a newer one:
 
 ```bash
-npm install npm@10.2.4 -g
+npm install npm@11 -g
 ```
 
 Note: if you see this error:
@@ -47,9 +47,9 @@ npm ERR! This command does not support workspaces.
 ```
 you can run ```npx next telemetry disable```
 
-Alternatively, you can use `nvm` to install the correct version of npm:
+Alternatively, you can use `nvm` to install the version in `.nvmrc`:
 ```bash
-nvm install 20.11.0
+nvm install
 ```
 
 ### Install Dependencies

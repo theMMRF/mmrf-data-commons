@@ -5,7 +5,7 @@ import { useSsmPlotQuery } from '@/core/features/cancerDistribution';
 import ChartTitleBar from './ChartTitleBar';
 import { CountSpan } from '@/components/tailwindComponents';
 import BarChartTextVersion from './BarChartTextVersion';
-import { PlotMouseEvent } from 'plotly.js';
+import type { PlotMouseEvent } from 'plotly.js';
 import { FilterSet, EmptyFilterSet } from '@gen3/core';
 
 const BarChart = dynamic(() => import('./BarChart'), {
