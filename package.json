@@ -21,6 +21,7 @@
     "build:middlewarePaths": "node ./node_modules/@gen3/toolsff/dist/scanSitePaths.esm.js",
     "getSchema": "node ./node_modules/@gen3/toolsff/dist/getSchema.esm.js --out=config/",
     "getDRSToHostname": "node ./node_modules/@gen3/toolsff/dist/getDRSToHostname.esm.js --out=config/",
+    "test:analytics": "jest --runInBand src/lib/analytics.unit.test.ts src/lib/cookieConsent.unit.test.ts",
     "test:metadata-auth": "node --test test/protein-paint-auth.test.cjs",
     "test:umap-release": "node --test test/umap-release.test.cjs",
     "test:navigation-auth": "node --test test/navigation-auth.test.cjs && jest --runInBand src/middleware-impl.unit.test.ts",
