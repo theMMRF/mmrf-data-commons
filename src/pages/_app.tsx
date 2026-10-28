@@ -131,7 +131,9 @@ const Gen3App = ({
                 )}
                 {!hideMainNavigation && <MainNavigation />}
                 <Component {...pageProps} />
-                <MaintenanceNotice blocked={cookieConsentState === 'pending'} />
+                <MaintenanceNotice
+                  blocked={analyticsAllowed && cookieConsentState === 'pending'}
+                />
                 <GoogleAnalyticsLoader
                   enabled={analyticsAllowed && cookieConsentState === 'accepted'}
                   gaMeasurementId={gaMeasurementId}
