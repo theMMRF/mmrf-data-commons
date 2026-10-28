@@ -32,6 +32,7 @@ import { registerGenesAndMutationFrequencyAnalysisTool } from "@/features/genomi
 import Gen3GDCCompatabilityProvider from "@/utils/providers";
 import { registerMMRFTableCellRenderers } from "@/components/ExplorerCellRenderers";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
+import MaintenanceNotice from "@/components/MaintenanceNotice";
 import GoogleAnalyticsLoader from "@/components/GoogleAnalyticsLoader";
 import { isAnalyticsAllowed } from "@/lib/analytics";
 import MainNavigation from "@/components/Navigation/MainNavigation/MainNavigation";
@@ -130,6 +131,7 @@ const Gen3App = ({
                 )}
                 {!hideMainNavigation && <MainNavigation />}
                 <Component {...pageProps} />
+                <MaintenanceNotice blocked={cookieConsentState === 'pending'} />
                 <GoogleAnalyticsLoader
                   enabled={analyticsAllowed && cookieConsentState === 'accepted'}
                   gaMeasurementId={gaMeasurementId}

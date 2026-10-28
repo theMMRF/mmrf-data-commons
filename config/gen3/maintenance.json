@@ -1,0 +1,9 @@
+{
+  "enabled": false,
+  "id": "system-upgrade",
+  "title": "Scheduled system maintenance",
+  "message": "Virtual Lab services may be briefly unavailable today while we perform a system upgrade. Thank you for your patience.",
+  "buttonLabel": "Understood",
+  "startsAt": "",
+  "endsAt": ""
+}
