@@ -2,7 +2,7 @@
 
 Edit `config/gen3/maintenance.json` to configure the notice. It ships disabled
 with draft copy and empty dates. To enable it, set `enabled` to `true` and supply
-both `startsAt` and `endsAt` as ISO timestamps with explicit timezone offsets, 
+both `startsAt` and `endsAt` as ISO timestamps with explicit timezone offsets,
 for example `2026-10-28T13:00:00-04:00`. Midnight after October 28 in New York is
 `2026-10-29T00:00:00-04:00`. Choose the actual maintenance window before enabling.
 Invalid, missing, or reversed dates suppress the notice.
