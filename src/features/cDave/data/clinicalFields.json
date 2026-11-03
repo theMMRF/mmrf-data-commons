@@ -371,7 +371,7 @@
     }
   },
   {
-    "description": "Age at the time of diagnosis expressed in number of days since birth.",
+    "description": "Age at the time of diagnosis, in years. MMRF API values are already in years.",
     "name": "diagnoses__age_at_diagnosis",
     "type": {
       "name": "NumericAggregations"

@@ -31,7 +31,9 @@ const DiagnosesTables = ({ data }: { data: Diagnoses }): JSX.Element => {
       diagnosis_id,
       diagnosis_uuid,
       classification_of_tumor,
-      age_at_diagnosis: ageDisplay(age_at_diagnosis as number),
+      age_at_diagnosis: age_at_diagnosis == null
+        ? '--'
+        : `${age_at_diagnosis} ${age_at_diagnosis === 1 ? 'year' : 'years'}`,
       days_to_last_follow_up: ageDisplay(days_to_last_follow_up as number),
       days_to_last_known_disease_status: ageDisplay(
         days_to_last_known_disease_status as number,

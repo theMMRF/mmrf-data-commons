@@ -32,25 +32,28 @@ This documentation is currently less complete than we would like, but we will be
 
 ## Installation
 
-The minimum node version is set to v20.11.0 only from an LTS perspective.
-Node can be downloaded from the official Node.js site. You may also consider using a [Node version manager](https://docs.npmjs.com/cli/v7/configuring-npm/install#using-a-node-version-manager-to-install-nodejs-and-npm).
-Your version of Node may not ship with npm v10. To install it, run:
+This project requires Node.js >=24.18.1 and npm >=11.16.0, as specified in
+`package.json`. `.npmrc` enforces these requirements with `engine-strict=true`.
+Using [nvm](https://github.com/nvm-sh/nvm), run these commands from the repository
+root in your terminal (including the integrated terminal in Cursor):
 
 ```bash
-npm install npm@10.2.4 -g
+nvm install
+nvm use
+node --version
+npm --version
 ```
 
-Note: if you see this error:
-```
-npm ERR! code ENOWORKSPACES
-npm ERR! This command does not support workspaces.
-```
-you can run ```npx next telemetry disable```
+The Node version is read from `.nvmrc`. Run `nvm use` in each new terminal before
+working on this project. If the selected Node installation has an older npm,
+update npm after selecting Node:
 
-Alternatively, you can use `nvm` to install the correct version of npm:
 ```bash
-nvm install 20.11.0
+npm install --global npm@11.16.0
 ```
+
+An `EBADENGINE` error means the active Node or npm version does not satisfy these
+requirements. Select the correct runtime instead of disabling engine checks.
 
 ### Install Dependencies
 
@@ -62,6 +65,20 @@ npm install
 
 ### Run the Development Server
 
+The development server runs the frontend; it does not start the Gen3 backend
+services. To use the hosted VLab development backend, create the git-ignored
+`.env.development.local` file in the repository root with:
+
+```dotenv
+NEXT_PUBLIC_GEN3_API_TARGET=https://dev-virtuallab.themmrf.org
+```
+
+Keep `NEXT_PUBLIC_GEN3_API=http://localhost:3000` in `.env.development` so browser
+requests go through the local development proxy. Restart the server after changing
+environment variables. Without an API target, the proxy defaults to
+`https://localhost`; if no backend is running there, it will fail with
+`ECONNREFUSED` on port 443 and display a commons services error.
+
 ```bash
 npm run dev
 ```
@@ -71,11 +88,45 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Docker
 
+### Synthetic sandbox builds
+
+Google Analytics and its tracking-consent modal are disabled for synthetic builds,
+development/test builds, loopback hosts, and hosts other than the build-time
+`NEXT_PUBLIC_GA_HOSTNAME`. The production configuration permits only
+`virtuallab.themmrf.org`; consent and `NEXT_PUBLIC_GA_MEASUREMENT_ID` are still
+required to load Google Analytics there. Keep that hostname restricted to the
+production site when building dev/preview images. Essential application cookies
+and local cohort storage continue to work without the tracking modal. These
+`NEXT_PUBLIC_` settings require rebuilding the frontend image.
+
+The standalone [Virtual Lab sandbox](https://github.com/theMMRF/mmrf-virtual-lab-sandbox)
+provides generated data, a disposable local identity provider, and local/AWS
+deployment configuration. Build with `NEXT_PUBLIC_SYNTHETIC_SANDBOX=1` to show a
+synthetic-data notice, disable analytics, and prevent demo-mode URLs from loading
+the historical demonstration fixtures. This flag does not bypass authentication;
+the sandbox supplies its own isolated identity services. Leave the flag unset
+for normal deployments.
+
 You build a Docker image by:
 
 ```bash
 docker build .
+# Presentation flag only; use the standalone sandbox for generated data/services.
+docker build --build-arg NEXT_PUBLIC_SYNTHETIC_SANDBOX=1 .
 ```
+
+## CI and deployment
+
+AWS CodePipeline and CodeBuild handle the deployment image build and storage in
+Amazon ECR. GitHub Actions runs lint and Storybook interaction/accessibility
+checks when a pull request is opened, updated, or reopened. It does not publish
+container images. New commits to the same PR cancel superseded check runs.
+
+The inherited CTDS image-publishing workflow and its bundled security job have
+been removed. GitHub Actions does not need Quay or AWS publishing credentials for
+the retained PR checks. Existing repository secrets are not deleted by this
+change; check their use by other systems before removing them.
+
 ## Updating a forked commons
 
 The following steps usually apply to update a forked commons.

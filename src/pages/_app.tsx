@@ -7,13 +7,10 @@ import mantinetheme from "../mantineTheme";
 
 import {
   Gen3Provider,
-  type ModalsConfig,
   registerCohortBuilderDefaultPreviewRenderers,
-  RegisteredIcons,
   registerExplorerDefaultCellRenderers,
   registerMetadataSchemaApp,
   registerDiscoveryDefaultCellRenderers,
-  SessionConfiguration,
 } from "@gen3/frontend";
 
 import { registerCohortTableCustomCellRenderers } from "@/lib/CohortBuilder/CustomCellRenderers";
@@ -28,14 +25,16 @@ import "@fontsource/noto-sans";
 
 import { setDRSHostnames } from "@gen3/core";
 import drsHostnames from "../../config/drsHostnames.json";
-import { loadContent } from "@/lib/content/loadContent";
+import { loadAppConfig, type AppConfig } from "@/lib/content/loadAppConfig";
 import Loading from "../components/Loading";
 import { registerCohortComparisonApp } from "@/features/cohortComparison/registerApp";
 import { registerGenesAndMutationFrequencyAnalysisTool } from "@/features/genomic/registerApp";
 import Gen3GDCCompatabilityProvider from "@/utils/providers";
 import { registerMMRFTableCellRenderers } from "@/components/ExplorerCellRenderers";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
+import MaintenanceNotice from "@/components/MaintenanceNotice";
 import GoogleAnalyticsLoader from "@/components/GoogleAnalyticsLoader";
+import { isAnalyticsAllowed } from "@/lib/analytics";
 import MainNavigation from "@/components/Navigation/MainNavigation/MainNavigation";
 import {
   acceptCookieConsent,
@@ -44,7 +43,6 @@ import {
   type CookieConsentState,
 } from "@/lib/cookieConsent";
 import {
-  type AuthorizedRoutesConfig,
   DefaultAuthorizedRoutesConfig,
 } from '@gen3/frontend';
 
@@ -56,12 +54,7 @@ if (typeof window !== "undefined" && process.env.NODE_ENV !== "production") {
   axe(React, ReactDOM, 1000);
 }
 
-interface Gen3AppProps {
-  icons: Array<RegisteredIcons>;
-  modalsConfig: ModalsConfig;
-  sessionConfig: SessionConfiguration;
-  protectedRoutes: AuthorizedRoutesConfig;
-}
+type Gen3AppProps = AppConfig;
 
 const Gen3App = ({
   Component,
@@ -73,6 +66,7 @@ const Gen3App = ({
   const isFirstRender = useRef(true);
   const router = useRouter();
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  const syntheticSandbox = process.env.NEXT_PUBLIC_SYNTHETIC_SANDBOX === '1';
   const hideMainNavigation = router.pathname === "/Login";
 
   useEffect(() => {
@@ -96,6 +90,12 @@ const Gen3App = ({
   const [isClient, setIsClient] = useState(false);
   const [cookieConsentState, setCookieConsentState] =
     useState<CookieConsentState>('pending');
+  const analyticsAllowed = isClient && isAnalyticsAllowed({
+    nodeEnv: process.env.NODE_ENV,
+    syntheticSandbox,
+    hostname: window.location.hostname,
+    analyticsHostname: process.env.NEXT_PUBLIC_GA_HOSTNAME,
+  });
 
   useEffect(() => {
     setCookieConsentState(getCookieConsentState());
@@ -124,13 +124,21 @@ const Gen3App = ({
               contextModals={mmrfModals}
             >
               <Gen3GDCCompatabilityProvider>
+                {syntheticSandbox && (
+                  <div role="note" className="bg-amber-100 p-3 text-center text-sm text-amber-950">
+                    Synthetic sandbox — all data is fabricated and has no clinical meaning.
+                  </div>
+                )}
                 {!hideMainNavigation && <MainNavigation />}
                 <Component {...pageProps} />
+                <MaintenanceNotice
+                  blocked={analyticsAllowed && cookieConsentState === 'pending'}
+                />
                 <GoogleAnalyticsLoader
-                  enabled={cookieConsentState === 'accepted'}
+                  enabled={analyticsAllowed && cookieConsentState === 'accepted'}
                   gaMeasurementId={gaMeasurementId}
                 />
-                {cookieConsentState === 'pending' && (
+                {analyticsAllowed && cookieConsentState === 'pending' && (
                   <CookieConsentBanner
                     onAccept={handleCookieConsentAccept}
                     onDismiss={handleCookieConsentDismiss}
@@ -155,7 +163,7 @@ Gen3App.getInitialProps = async (
   const ctx = await App.getInitialProps(context);
 
   try {
-    const res = await loadContent();
+    const res = await loadAppConfig();
     return {
       ...ctx,
       ...res,
@@ -175,7 +183,7 @@ Gen3App.getInitialProps = async (
         height: 0,
       },
     ],
-    modalsConfig: {},
+    modalsConfig: { systemUseModal: { enabled: false, content: { text: [] } } },
     sessionConfig: {},
     protectedRoutes: DefaultAuthorizedRoutesConfig,
   };

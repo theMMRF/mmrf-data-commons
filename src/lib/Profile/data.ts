@@ -4,14 +4,12 @@ import {
   ContentSource,
   getNavPageLayoutPropsFromConfig,
   NavPageLayoutProps,
-  QueryProps,
 } from "@gen3/frontend";
 
 export const ProfilePageGetServerSideProps: GetServerSideProps<
   NavPageLayoutProps
 > = async () => {
-  const profileConfig: QueryProps =
-    await ContentSource.getContentDatabase().get(
+  const profileConfig = await ContentSource.getContentDatabase().get(
       `${GEN3_COMMONS_NAME}/profile.json`,
     );
 

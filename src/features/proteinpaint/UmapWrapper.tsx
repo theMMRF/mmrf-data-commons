@@ -8,11 +8,11 @@ import {
   //PROTEINPAINT_API,
   useFetchUserDetailsQuery,
   useCoreDispatch,
-  convertFilterSetToGqlFilter as buildCohortGqlOperator
 } from "@gen3/core";
 import { isEqual, cloneDeep } from "lodash";
 import { DemoText } from "@/components/tailwindComponents";
 import { selectCurrentCohortCaseFilters } from "@/core/utils";
+import { buildCohortGqlOperator } from "@/core/utils/filters";
 import { COHORT_FILTER_INDEX, PROTEINPAINT_API } from '@/core';
 
 const basepath = PROTEINPAINT_API;

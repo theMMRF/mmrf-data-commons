@@ -234,12 +234,12 @@
     "facet_type": "enum"
   },
   "cases.diagnoses.age_at_diagnosis": {
-    "description": "Age at the time of diagnosis expressed in number of days since birth.",
+    "description": "Age at the time of diagnosis, in years. MMRF API values are already in years.",
     "doc_type": "cases",
     "field": "diagnoses.age_at_diagnosis",
     "full": "cases.diagnoses.age_at_diagnosis",
     "type": "long",
-    "facet_type": "age",
+    "facet_type": "age_in_years",
     "range": {
       "minimum": 0,
       "maximum": 32872

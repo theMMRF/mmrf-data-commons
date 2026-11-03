@@ -1,6 +1,6 @@
 import { parse } from 'cookie';
-import { decodeJwt, importSPKI, JWTPayload, jwtVerify } from 'jose';
-import { fetchJWTKey } from '@gen3/frontend/server';
+import { errors, importSPKI, type JWTPayload, jwtVerify } from 'jose';
+import { getFenceJwtKey } from './fenceJwtKey';
 
 export const isExpired = (value: number) => value * 1000 < Date.now();
 export interface JWTPayloadAndUser extends JWTPayload {
@@ -37,7 +37,7 @@ export async function getLoginStatus(cookie?: string): Promise<LoginStatus> {
   try {
     const accessToken = getAccessToken(cookie);
     if (accessToken) {
-      const jwtKey = await fetchJWTKey(process.env.NODE_ENV === 'production');
+      const jwtKey = await getFenceJwtKey();
 
       if (!jwtKey) {
         return {
@@ -46,9 +46,23 @@ export async function getLoginStatus(cookie?: string): Promise<LoginStatus> {
         };
       }
       // validate the token
-      const publicKey = await importSPKI(jwtKey, 'RS256');
-      await jwtVerify(accessToken, publicKey);
-      const decodedAccessToken = decodeJwt(accessToken) as JWTPayloadAndUser;
+      const verify = async (key: string) =>
+        jwtVerify(accessToken, await importSPKI(key, 'RS256'), {
+          algorithms: ['RS256'],
+        });
+      let verified;
+      try {
+        verified = await verify(jwtKey);
+      } catch (error) {
+        if (!(error instanceof errors.JWSSignatureVerificationFailed))
+          throw error;
+        // Fence may have rotated its signing key. Retry only with a changed
+        // public key; the cache bounds concurrent and repeated refreshes.
+        const refreshedKey = await getFenceJwtKey(true);
+        if (!refreshedKey || refreshedKey === jwtKey) throw error;
+        verified = await verify(refreshedKey);
+      }
+      const decodedAccessToken = verified.payload as JWTPayloadAndUser;
       return {
         issued: decodedAccessToken.iat,
         expires: decodedAccessToken.exp,
