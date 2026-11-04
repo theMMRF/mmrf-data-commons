@@ -25,13 +25,18 @@ const termsApiRewrites = [
   { source: '/terms-api/accept', destination: '/api/terms/accept' },
 ];
 
+const basePath = process.env.BASE_PATH || '';
+
 // Next configuration with support for rewrting API to existing common services
 const nextConfig = {
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
   output: 'standalone',
   reactStrictMode: true,
   productionBrowserSourceMaps: true,
   pageExtensions: ['mdx', 'md', 'jsx', 'js', 'tsx', 'ts'],
-  basePath: process.env.BASE_PATH || '',
+  basePath,
   experimental: {
     esmExternals: true,
   },
@@ -51,6 +56,7 @@ const nextConfig = {
         process.env.NEXT_PUBLIC_GEN3_API_TARGET || 'https://localhost';
       return [
         ...termsApiRewrites,
+        { source: '/protein-paint/:path*', destination: '/api/protein-paint/:path*' },
         { source: '/_status', destination: `${GEN3_TARGET}/_status` },
         { source: '/user/:path*', destination: `${GEN3_TARGET}/user/:path*` },
         {

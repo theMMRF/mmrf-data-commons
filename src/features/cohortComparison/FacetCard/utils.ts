@@ -1,50 +1,27 @@
-import { DAYS_IN_YEAR } from "@/core";
-import { FilterSet } from "@gen3/core";
+import type { FilterSet } from "@gen3/core";
 
 export const formatBucket = (
   bucket: [number, number] | string,
   field: string,
 ): string => {
-  if (field === "diagnoses.age_at_diagnosis") {
-    const age = Math.round((bucket as [number, number])[0] / DAYS_IN_YEAR);
-    return age === 80 ? "80+ years" : `${age} to <${age + 10} years`;
+  if (field === "diagnoses.age_at_diagnosis" && Array.isArray(bucket)) {
+    return `${bucket[0]} to <${bucket[1]} years`;
   }
 
   return bucket === "_missing" ? "missing" : (bucket as string);
 };
 
 export const createFilters = (field: string , bucket: string | [number, number]): FilterSet => {
-  if (field === "diagnoses.age_at_diagnosis") {
-    const numericBucket = Number(bucket[0]);
-    if (numericBucket === 80 * DAYS_IN_YEAR) {
-      return {
-        mode: "and",
-        root: {
-          [field]: {
-            field,
-            operator: ">=",
-            operand: numericBucket,
-          },
-        },
-      };
-    }
-
+  if (field === "diagnoses.age_at_diagnosis" && Array.isArray(bucket)) {
+    // Use the API's half-open bounds so adjacent age cohorts never overlap.
     return {
       mode: "and",
       root: {
         [field]: {
           operator: "and",
           operands: [
-            {
-              field,
-              operator: ">=",
-              operand: numericBucket,
-            },
-            {
-              field,
-              operator: "<=",
-              operand: numericBucket + DAYS_IN_YEAR * 10 - 0.1,
-            },
+            { field, operator: ">=", operand: bucket[0] },
+            { field, operator: "<", operand: bucket[1] },
           ],
         },
       },

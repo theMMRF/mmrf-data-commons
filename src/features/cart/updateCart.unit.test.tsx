@@ -1,7 +1,7 @@
 import { showNotification } from "@mantine/notifications";
 import { fireEvent } from "@testing-library/react";
 import { render } from "test-utils";
-import { CartFile } from "@/core";
+import { CartItem } from "@gen3/core";
 import { addToCart, removeFromCart } from "./updateCart";
 
 jest.mock("@mantine/notifications");
@@ -13,7 +13,7 @@ describe("updateCart, addToCart", () => {
   it("add single file", () => {
     const dispatchMock = jest.fn();
     addToCart(
-      [{ file_name: "filey", file_id: "1" } as CartFile],
+      [{ id: "1", file_name: "filey", file_id: "1" } as CartItem],
       [],
       dispatchMock,
     );
@@ -29,8 +29,8 @@ describe("updateCart, addToCart", () => {
     const dispatchMock = jest.fn();
 
     addToCart(
-      [{ file_name: "filey", file_id: "1" } as CartFile],
-      [{ file_id: "1" } as CartFile],
+      [{ id: "1", file_name: "filey", file_id: "1" } as CartItem],
+      [{ id: "1", file_id: "1" } as CartItem],
       dispatchMock,
     );
 
@@ -47,9 +47,9 @@ describe("updateCart, addToCart", () => {
     const dispatchMock = jest.fn();
     addToCart(
       [
-        { file_name: "filey", file_id: "1" },
-        { file_name: "abc", file_id: "2" },
-      ] as CartFile[],
+        { id: "1", file_name: "filey", file_id: "1" },
+        { id: "2", file_name: "abc", file_id: "2" },
+      ] as CartItem[],
       [],
       dispatchMock,
     );
@@ -65,10 +65,10 @@ describe("updateCart, addToCart", () => {
     const dispatchMock = jest.fn();
     addToCart(
       [
-        { file_name: "filey", file_id: "1" },
-        { file_name: "abc", file_id: "2" },
-      ] as CartFile[],
-      [{ file_id: "2" } as CartFile],
+        { id: "1", file_name: "filey", file_id: "1" },
+        { id: "2", file_name: "abc", file_id: "2" },
+      ] as CartItem[],
+      [{ id: "2", file_id: "2" } as CartItem],
       dispatchMock,
     );
 
@@ -86,12 +86,15 @@ describe("updateCart, addToCart", () => {
     const dispatchMock = jest.fn();
     addToCart(
       [
-        { file_name: "filey", file_id: "1" },
-        { file_name: "abc", file_id: "2" },
-        { file_name: "filey", file_id: "3" },
-        { file_name: "abc", file_id: "4" },
-      ] as CartFile[],
-      [{ file_id: "2" }, { file_id: "4" }] as CartFile[],
+        { id: "1", file_name: "filey", file_id: "1" },
+        { id: "2", file_name: "abc", file_id: "2" },
+        { id: "3", file_name: "filey", file_id: "3" },
+        { id: "4", file_name: "abc", file_id: "4" },
+      ] as CartItem[],
+      [
+        { id: "2", file_id: "2" },
+        { id: "4", file_id: "4" },
+      ] as CartItem[],
       dispatchMock,
     );
 
@@ -107,10 +110,17 @@ describe("updateCart, addToCart", () => {
 
   it("add too many files", () => {
     const dispatchMock = jest.fn();
-    const files = Array(9999).fill({ file_name: "filey", file_id: "1" });
+    const files = Array(9999).fill({
+      id: "1",
+      file_name: "filey",
+      file_id: "1",
+    });
     addToCart(
       files,
-      [{ file_id: "2" }, { file_id: "4" }] as CartFile[],
+      [
+        { id: "2", file_id: "2" },
+        { id: "4", file_id: "4" },
+      ] as CartItem[],
       dispatchMock,
     );
 
@@ -129,7 +139,7 @@ describe("updateCart, addToCart", () => {
   it("undo button shows remove notification", () => {
     const dispatchMock = jest.fn();
     addToCart(
-      [{ file_name: "filey", file_id: "1" } as CartFile],
+      [{ id: "1", file_name: "filey", file_id: "1" } as CartItem],
       [],
       dispatchMock,
     );
@@ -152,8 +162,8 @@ describe("updateCart, addToCart", () => {
     const dispatchMock = jest.fn();
 
     addToCart(
-      [{ file_name: "filey", file_id: "1" } as CartFile],
-      [{ file_id: "1" } as CartFile],
+      [{ id: "1", file_name: "filey", file_id: "1" } as CartItem],
+      [{ id: "1", file_id: "1" } as CartItem],
       dispatchMock,
     );
 
@@ -167,8 +177,8 @@ describe("updateCart, addToCart", () => {
 describe("updateCart, removeFromCart", () => {
   it("remove single file", () => {
     removeFromCart(
-      [{ file_name: "abc", file_id: "2" }] as CartFile[],
-      [{ file_id: "2" } as CartFile],
+      [{ id: "2", file_name: "abc", file_id: "2" }] as CartItem[],
+      [{ id: "2", file_id: "2" } as CartItem],
       jest.fn(),
     );
 
@@ -181,10 +191,13 @@ describe("updateCart, removeFromCart", () => {
   it("remove multiple files", () => {
     removeFromCart(
       [
-        { file_name: "filey", file_id: "1" },
-        { file_name: "abc", file_id: "2" },
-      ] as CartFile[],
-      [{ file_id: "1" }, { file_id: "2" }] as CartFile[],
+        { id: "1", file_name: "filey", file_id: "1" },
+        { id: "2", file_name: "abc", file_id: "2" },
+      ] as CartItem[],
+      [
+        { id: "1", file_id: "1" },
+        { id: "2", file_id: "2" },
+      ] as CartItem[],
       jest.fn(),
     );
 
@@ -196,8 +209,8 @@ describe("updateCart, removeFromCart", () => {
 
   it("undo button shows add notification", () => {
     removeFromCart(
-      [{ file_name: "abc", file_id: "2" }] as CartFile[],
-      [{ file_id: "2" } as CartFile],
+      [{ id: "2", file_name: "abc", file_id: "2" }] as CartItem[],
+      [{ id: "2", file_id: "2" } as CartItem],
       jest.fn(),
     );
 

@@ -13,11 +13,12 @@ interface CohortFacetsRequest {
   index: string;
 }
 
-const DAYS_IN_DECADE = 3652; // Note: an approximation
+// MMRF diagnoses.age_at_diagnosis is returned in years, not days.
+const YEARS_IN_DECADE = 10;
 
 export const cohortFacetSlice = graphQLAPI.injectEndpoints({
   endpoints: (builder) => ({
-    cohortFacets: builder.query<AggregationsData, CohortFacetsRequest>({
+    mmrfCohortFacets: builder.query<AggregationsData, CohortFacetsRequest>({
       query: ({
         index,
         facetFields,
@@ -34,7 +35,7 @@ export const cohortFacetSlice = graphQLAPI.injectEndpoints({
           facets: facetFields,
           interval: continuousFacets.reduce(
             (acc: Record<string, number>, x) => {
-              acc[x] = DAYS_IN_DECADE;
+              acc[x] = YEARS_IN_DECADE;
               return acc;
             },
             {},
@@ -52,4 +53,4 @@ export const cohortFacetSlice = graphQLAPI.injectEndpoints({
   }),
 });
 
-export const { useCohortFacetsQuery } = cohortFacetSlice;
+export const { useMmrfCohortFacetsQuery: useCohortFacetsQuery } = cohortFacetSlice;

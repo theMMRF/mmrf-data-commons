@@ -1,0 +1,48 @@
+/* Gen3 0.12.66 does not expose its facet grid or enum label styles.
+   Keep this compatibility override within this builder and the CGS field IDs.
+   On Gen3 upgrades, check the facet-group test ID, field IDs, and label's
+   .truncate class against CohortBuilder.stories.tsx using the actual builder.
+   Remove these rules if Gen3 exposes equivalent layout/wrapping options. */
+
+/* Follow the rendered tab selection, which updates before Next.js finishes
+   syncing the URL. Gen3 does not expose its active-tab state to this wrapper.
+   display:none also removes the inactive reference from keyboard navigation
+   and the accessibility tree. Keep the tab test ID covered by the story. */
+.cgsReference {
+  display: none;
+}
+
+.cohortBuilder:has(
+    [data-testid='button-cohort-builder-cgs-risk'][aria-selected='true']
+  )
+  .cgsReference {
+  display: block;
+}
+
+.cohortBuilder [role='tabpanel']:has([id^='cgs_risk_key_criteria.']) {
+  min-width: 0;
+}
+
+.cohortBuilder
+  [data-testid='title-cohort-builder-facet-groups']:has(
+    [id^='cgs_risk_key_criteria.']
+  ) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+}
+
+.cohortBuilder
+  [id^='cgs_risk_key_criteria.']
+  [role='group']
+  > div:has(> :global(.truncate)) {
+  align-items: flex-start;
+}
+
+.cohortBuilder
+  [id^='cgs_risk_key_criteria.']
+  [role='group']
+  :global(.truncate) {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+}

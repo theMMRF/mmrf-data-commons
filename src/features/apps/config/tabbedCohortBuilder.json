@@ -79,7 +79,7 @@
           "label": "Age at Diagnosis",
           "field": "diagnoses.age_at_diagnosis",
           "type": "age_in_years",
-          "description": "Age in days at which a condition or disease was first diagnosed. CDE: 3225640. TCGA has the age in years with CDE 2006657, this is converted by ceil(age*365.25) to get days.",
+          "description": "Age at the time of diagnosis, in years. MMRF API values are already in years and must not be divided by days per year.",
           "range": {
             "maximum": 32872,
             "minimum": 0,
@@ -328,6 +328,39 @@
             "maximum": 36525,
             "minimum": 0
           }
+        }
+      },
+      "queryOptions": {
+        "index": "case_centric",
+        "indexPrefix": "CaseCentric_"
+      }
+    },
+    "cgs_risk": {
+      "label": "CGS Risk",
+      "facets": [
+        "cgs_risk_key_criteria.cgs_risk_category",
+        "cgs_risk_key_criteria.cgs_risk_criteria",
+        "cgs_risk_key_criteria.other_criteria"
+      ],
+      "fieldsConfig": {
+        "cgs_risk_key_criteria.cgs_risk_category": {
+          "label": "CGS Risk Category",
+          "description": "The International Myeloma Society (IMS) and International Myeloma Working Group (IMWG) Consensus Genomic Staging (CGS) defines high-risk multiple myeloma using specific molecular, genetic, and biochemical markers to better predict patient survival and early relapse.",
+          "excludeValues": [
+            "na"
+          ]
+        },
+        "cgs_risk_key_criteria.cgs_risk_criteria": {
+          "label": "CGS Risk Criteria",
+          "description": "The Consensus Genomic Staging (CGS) risk criteria met by the case. Only criteria with a positive result are included; negative and unavailable criterion results are omitted.",
+          "defaultSort": "label-asc",
+          "showMatchModeSelector": true
+        },
+        "cgs_risk_key_criteria.other_criteria": {
+          "label": "Other Criteria",
+          "description": "Known positive and negative results for genomic and laboratory criteria used to derive Consensus Genomic Staging (CGS) risk. Unavailable results are omitted.",
+          "defaultSort": "label-asc",
+          "showMatchModeSelector": true
         }
       },
       "queryOptions": {

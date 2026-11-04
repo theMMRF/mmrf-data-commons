@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import { getLoginStatus } from '@/lib/auth/getLoginStatus';
+import type { LoginStatus } from '@/lib/auth/getLoginStatus';
 
 interface MiddlewareTermsCheckResult {
   hasAcceptedLatestTerms: boolean;
@@ -42,9 +42,9 @@ const getTermsStatusUrls = (req: NextRequest): URL[] => {
  */
 export const fetchTermsAcceptedFromBff = async (
   req: NextRequest,
+  loginStatus: LoginStatus,
 ): Promise<MiddlewareTermsCheckResult> => {
   const cookieHeader = req.headers.get('Cookie') || '';
-  const loginStatus = await getLoginStatus(cookieHeader);
 
   if (loginStatus.status !== 'issued') {
     return {

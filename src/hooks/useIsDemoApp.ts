@@ -10,5 +10,5 @@ export const useIsDemoApp: useIsDemoAppType = (): boolean => {
   const {
     query: { demoMode },
   } = useRouter();
-  return demoMode === "true";
+  return process.env.NEXT_PUBLIC_SYNTHETIC_SANDBOX !== '1' && demoMode === "true";
 };

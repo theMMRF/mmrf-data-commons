@@ -180,7 +180,7 @@ export const getTermsGateResult = async (
     };
   }
 
-  const identity = await resolveUserIdentity(cookieHeader, requestOrigin);
+  const identity = await resolveUserIdentity(cookieHeader, requestOrigin, loginStatus);
 
   try {
     const status = await fetchTermsStatus(accessToken, identity, requestOrigin);
