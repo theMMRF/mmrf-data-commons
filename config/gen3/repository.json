@@ -12,7 +12,6 @@
           "data_format",
           "platform",
           "access",
-          "cases.samples.disease_stage",
           "cases.samples.tissue_type",
           "cases.samples.tumor_descriptor",
           "cases.samples.specimen_type",

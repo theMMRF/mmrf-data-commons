@@ -6,6 +6,7 @@
         "title": "Filters",
         "fields": [
           "experimental_strategy",
+          "cases.samples.disease_stage",
           "data_category",
           "data_type",
           "data_format",

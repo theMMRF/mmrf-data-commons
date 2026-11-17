@@ -29,8 +29,6 @@ import {
   FacetQueryResponse,
 } from '@/features/types';
 import { useRawDataAndTotalCountQuery } from '@/core/features/cohortQuery/cohortQuerySlice';
-import { useGetFileCaseCountQuery } from '@/core/features/files/filesSlice';
-import { mergeFilterWithPrefix } from '@/core/utils';
 
 export const useGetFacetValuesQuery = (
   args: CohortCentricAggsQueryRequest,
@@ -47,6 +45,9 @@ export const useGetFacetValuesQuery = (
   };
 };
 
+// The file index's case id, counted distinctly for the repository's case total.
+const caseIdField = 'cases.case_id';
+
 const buildFileStatsQuery = (
   type: string,
   fileSizeField: string,
@@ -58,6 +59,7 @@ const buildFileStatsQuery = (
     ${indexPrefix}_aggregation {
         ${type} (accessibility: $accessibility, filter: $filter) {
             ${customQueryStrForField(fileItemIdField, '{_totalCount }')}
+            ${customQueryStrForField(caseIdField, '{ _cardinalityCount(precision_threshold: 40000) }')}
             ${customQueryStrForField(fileSizeField, ' {  histogram {sum} }')}
         }
     }
@@ -111,15 +113,6 @@ export const useTotalFileSizeQuery = ({
       },
     };
   }
-  // need to query the number of cases using the query below which
-  // requires adding "file" to the repository filters
-
-  const caseFilterWithFiles = mergeFilterWithPrefix(cohortFilter, repositoryFilterWithCases, 'files.');
-  const { data: caseCounts, isFetching: isCaseCountsFetching, isSuccess: isCaseCountsSuccess } =
-    useGetFileCaseCountQuery({
-      filters: convertFilterSetToGqlFilter(caseFilterWithFiles)
-    });
-
   const cohortFilterGQL = convertFilterSetToGqlFilter(cohortFilter);
   const { data, isSuccess, isFetching, isError } = useGetCohortCentricQuery({
       cohortFilter: cohortFilterGQL,
@@ -131,7 +124,7 @@ export const useTotalFileSizeQuery = ({
   });
 
   useDeepCompareEffect(() => {
-    if (isSuccess && isCaseCountsSuccess) {
+    if (isSuccess) {
       const response = data.data as unknown as FileCountsQueryResponse;
       const countsRoot = getByPath(
         response?.[`${repositoryIndexPrefix}_aggregation`]?.[repositoryIndex],
@@ -141,7 +134,13 @@ export const useTotalFileSizeQuery = ({
         response?.[`${repositoryIndexPrefix}_aggregation`]?.[repositoryIndex]?.[
           fileSizeField
         ]?.histogram?.[0]?.sum || 0;
-      const totalCaseCount = caseCounts?.cases || 0;
+      // Distinct cases among the matching files, so file-level and sample-level
+      // filters (e.g. cases.samples.disease_stage) both narrow the count.
+      const totalCaseCount =
+        getByPath(
+          response?.[`${repositoryIndexPrefix}_aggregation`]?.[repositoryIndex],
+          caseIdField,
+        )?._cardinalityCount || 0;
       const totalFileCount =
         response?.[`${repositoryIndexPrefix}_aggregation`]?.[repositoryIndex]?.[
           fileItemIdField
