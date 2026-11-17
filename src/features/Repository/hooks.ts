@@ -173,7 +173,7 @@ export const useTotalFileSizeQuery = ({
         totalFileCount,
       });
     }
-  }, [data, isSuccess]);
+  }, [data, isSuccess, caseCounts, isCaseCountsSuccess]);
 
   return {
     data: totals,
