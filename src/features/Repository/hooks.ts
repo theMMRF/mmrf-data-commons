@@ -114,7 +114,28 @@ export const useTotalFileSizeQuery = ({
   // need to query the number of cases using the query below which
   // requires adding "file" to the repository filters
 
-  const caseFilterWithFiles = mergeFilterWithPrefix(cohortFilter, repositoryFilterWithCases, 'files.');
+  // File fields are matched under the case's files; sample fields such as
+  // cases.samples.disease_stage are fields of the case itself.
+  const caseLevel = (key: string) => key.startsWith('cases.');
+  const fileFilters = {
+    mode: repositoryFilters.mode,
+    root: Object.fromEntries(
+      Object.entries(repositoryFilters.root).filter(([key]) => !caseLevel(key)),
+    ),
+  };
+  const caseFilters = {
+    mode: repositoryFilters.mode,
+    root: Object.fromEntries(
+      Object.entries(repositoryFilters.root)
+        .filter(([key]) => caseLevel(key))
+        .map(([key, value]) => [key.slice('cases.'.length), value]),
+    ),
+  };
+  const caseFilterWithFiles = mergeFilterWithPrefix(
+    mergeFilterWithPrefix(cohortFilter, fileFilters, 'files.'),
+    caseFilters,
+    '',
+  );
   const { data: caseCounts, isFetching: isCaseCountsFetching, isSuccess: isCaseCountsSuccess } =
     useGetFileCaseCountQuery({
       filters: convertFilterSetToGqlFilter(caseFilterWithFiles)
@@ -152,7 +173,7 @@ export const useTotalFileSizeQuery = ({
         totalFileCount,
       });
     }
-  }, [data, isSuccess]);
+  }, [data, isSuccess, caseCounts, isCaseCountsSuccess]);
 
   return {
     data: totals,
