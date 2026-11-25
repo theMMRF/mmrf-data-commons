@@ -167,7 +167,8 @@ export const mapFileToCartItem = (
 
 export const REF_GENOME_EXCLUDED_TYPES = {
   fileType: ['masked_methylation_array'],
-  workflow_type: ['Birdseed'],
+  // Unaligned reads (e.g. CoMMpass single-cell FASTQs) were never aligned to a genome.
+  workflow_type: ['Birdseed', 'Unaligned'],
 };
 
 export const shouldDisplayReferenceGenome = (file: GdcFile) => {
