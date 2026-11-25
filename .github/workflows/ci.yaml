@@ -10,7 +10,8 @@ concurrency:
 
 jobs:
   interaction-and-accessibility:
-    runs-on: ubuntu-latest
+    # Playwright 1.59 can't install Chromium or its deps on ubuntu-26.04 (ubuntu-latest).
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
